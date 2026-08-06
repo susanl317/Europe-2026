@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>歐洲之旅 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<style>
+:root{
+  --bg:#f8f6f2;--white:#fff;--b:#e5e0d8;--b2:#d0cab8;
+  --tx:#1e1b14;--t2:#6b6356;--t3:#a09488;
+  --gold:#b07b0e;--amber:#e67e22;--info:#1d5fa8;
+  --sc:#1a6040;--sc-bg:#edf9f3;
+  --is:#1a4e7a;--is-bg:#eff6ff;
+  --fa:#0b6a79;--fa-bg:#edfbfd;
+  --ed:#6b3c1e;--ed-bg:#fdf5ef;
+  --ir:#1a5e35;--ir-bg:#edfaf2;
+  --it:#ae4b0e;--it-bg:#fff7f2;
+  --nav-h:52px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h)+6px)}
+body{font-family:"Noto Sans TC",sans-serif;background:var(--bg);color:var(--tx);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.topnav{position:sticky;top:0;z-index:999;height:var(--nav-h);background:rgba(248,246,242,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--b);display:flex;align-items:center;padding:0 16px;gap:10px;overflow-x:auto;scrollbar-width:none}
+.topnav::-webkit-scrollbar{display:none}
+.nav-brand{font-family:"Noto Serif TC",serif;font-size:14px;font-weight:700;white-space:nowrap;flex-shrink:0}
+.nav-sep{width:1px;height:16px;background:var(--b2);flex-shrink:0}
+.nav-pills{display:flex;gap:5px}
+.np{font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid var(--b);background:var(--white);color:var(--t2);white-space:nowrap;flex-shrink:0;transition:all .2s;text-decoration:none}
+.np:hover,.np.on{color:var(--vc,var(--info));border-color:var(--vc,var(--info));background:var(--vbg,#eff6ff)}
+.btt{position:fixed;bottom:22px;right:18px;z-index:998;width:42px;height:42px;border-radius:50%;background:var(--tx);color:#fff;border:none;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;box-shadow:0 4px 16px rgba(0,0,0,.28)}
+.btt.show{opacity:1}
+.site-hero{position:relative;background:#16301f;height:420px;overflow:hidden;display:flex;align-items:flex-end}
+@media(max-width:600px){.site-hero{height:270px}}
+.hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%}
+.site-hero::after{content:"";position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,rgba(8,20,14,.42) 0%,rgba(8,20,14,.12) 38%,rgba(8,20,14,.72) 100%)}
+.hero-content{text-shadow:0 2px 12px rgba(0,0,0,.55);position:relative;z-index:2;padding:0 28px 56px;color:#fff;width:100%;max-width:840px;margin:0 auto}
+.hero-kicker{font-size:11px;letter-spacing:4px;text-transform:uppercase;opacity:.7;margin-bottom:12px}
+.hero-h1{font-family:"Noto Serif TC",serif;font-size:clamp(34px,6vw,52px);font-weight:700;line-height:1.1;margin-bottom:14px}
+.hero-accent{width:50px;height:4px;background:#3dd68c;border-radius:2px;margin-bottom:16px}
+.hero-dates{font-size:16px;opacity:.9;margin-bottom:5px}
+.hero-locs{font-size:13px;opacity:.65;letter-spacing:.5px}
+.hero-wave{position:absolute;bottom:-1px;left:0;right:0;z-index:3;line-height:0}
+.wrap{max-width:800px;margin:0 auto;padding:0 20px}
+.sec-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-top:36px}
+.sec-num{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#ddeeff;color:var(--info);font-size:13px;font-weight:700;flex-shrink:0}
+.sec-title{font-family:"Noto Serif TC",serif;font-size:20px;font-weight:700}
+.sec-hint{font-size:13px;color:var(--t3);margin-left:4px}
+/* Overview table - simplified 2 col */
+.ov-wrap{border:1px solid var(--b);border-radius:14px;overflow:hidden;margin-bottom:40px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.ov-head{display:grid;grid-template-columns:100px 1fr;background:#ddeeff;padding:10px 16px;gap:8px}
+.ov-head span{font-size:12px;font-weight:600;color:var(--info);letter-spacing:.5px}
+.ov-row{display:grid;grid-template-columns:100px 1fr;padding:14px 16px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .15s;gap:8px;align-items:start}
+.ov-row:last-child{border-bottom:none}
+.ov-row:hover{background:#f4f2ee}
+.ov-date{font-size:17px;font-weight:700;line-height:1.1;display:block}
+.ov-days{font-size:11px;color:var(--t3);display:block;margin-top:3px}
+.ov-main{font-size:14px;font-weight:600;line-height:1.4}
+.ov-sub{font-size:12px;color:var(--t2);margin-top:3px}
+/* Country sections */
+.country-sec{scroll-margin-top:var(--nav-h)}
+.c-wave{line-height:0;display:block;overflow:hidden}
+.c-top-bar{height:5px;background:var(--cc)}
+.c-header{display:flex;align-items:flex-start;gap:16px;padding:24px 0 18px}
+.c-flag{font-size:40px;flex-shrink:0;line-height:1.2;margin-top:3px}
+.c-name{font-family:"Noto Serif TC",serif;font-size:clamp(22px,4vw,30px);font-weight:700}
+.c-en{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-top:4px}
+.c-period{display:inline-block;font-size:12px;border:1px solid var(--b);border-radius:20px;padding:3px 12px;margin-top:8px;color:var(--t2)}
+/* Stats cards - 2x2 grid */
+.c-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.cc{background:var(--white);border:1px solid var(--b);border-radius:10px;padding:12px 14px;box-shadow:0 1px 5px rgba(0,0,0,.05)}
+.cc-lb{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);margin-bottom:5px;display:flex;align-items:center;gap:4px}
+.cc-dim{font-size:10px;color:var(--t3);font-weight:400}
+.cc-val{font-size:14px;font-weight:600;color:var(--tx)}
+.cc-sub{font-size:12px;color:var(--t2);margin-top:2px;line-height:1.5}
+/* Timezone card */
+.cc-tz{margin-top:4px}
+.tz-row{display:flex;align-items:baseline;gap:6px;margin-bottom:4px}
+.tz-flag{font-size:13px;flex-shrink:0;line-height:1}
+.tz-time{font-size:13px;font-weight:600;color:var(--tx)}
+/* Warning card */
+.cc-warn{background:rgba(245,158,11,.06)!important;border:1px solid rgba(245,158,11,.3)!important}
+.cc-warn-body{font-size:12px;color:var(--t2);line-height:1.7;margin-top:4px}
+.cc-warn-body b{color:var(--tx)}
+/* Collapsibles */
+details{border-radius:12px;border:1px solid var(--b);background:var(--white);overflow:hidden;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+details summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:9px;padding:13px 16px;font-size:14px;font-weight:600;transition:background .15s;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary:hover{background:#fafaf7}
+details[open]>summary{border-bottom:1px solid var(--b);background:#fafaf7}
+.chev{margin-left:auto;color:var(--t3);font-size:14px;transition:transform .2s;flex-shrink:0}
+details[open] .chev{transform:rotate(90deg)}
+.det-in{padding:16px}
+details.sub{background:#f9f7f3;border-color:rgba(0,0,0,.07);margin:8px 0 0!important;box-shadow:none;border-radius:9px}
+details.sub summary{font-size:13px;font-weight:500;padding:10px 14px}
+details.sub .det-in{padding:12px 14px}
+.kp{font-size:14px;color:var(--t2);line-height:1.75;margin-bottom:10px}
+.kp b{color:var(--tx)}.kp a{color:var(--gold);text-decoration:underline}
+.stg{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+.stg th{background:#f0ece4;color:var(--t2);font-size:11px;text-transform:uppercase;letter-spacing:1px;padding:7px 10px;text-align:left;border-bottom:1px solid var(--b)}
+.stg td{padding:7px 10px;border-bottom:1px solid var(--b)}
+.stg tr:last-child td{border-bottom:none}
+.sb{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
+.pron-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;margin:10px 0}
+.pc{background:#f0ece4;border-radius:8px;padding:9px 12px}
+.p-en{font-weight:600;font-size:13px;color:var(--tx)}.p-zh{font-size:12px;color:var(--t2);margin-top:2px}
+.p-ipa{font-size:11px;color:var(--gold);font-weight:600;margin-top:2px;letter-spacing:.5px}
+.map-box{border-radius:10px;overflow:hidden;border:1px solid var(--b);margin:10px 0}
+.lmap{height:260px}
+@media(max-width:600px){.lmap{height:200px}}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px}
+.ic{background:#f9f7f3;border-radius:8px;padding:12px}
+.ic-lb{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);margin-bottom:6px}
+.ic-bd{font-size:13px;color:var(--t2);line-height:1.7}.ic-bd a{color:var(--gold)}.ic-bd b{color:var(--tx)}
+.atag{display:inline-block;font-size:11px;border:1px solid var(--b);border-radius:6px;padding:2px 7px;margin:2px;background:var(--white)}
+.tmt{width:100%;border-collapse:collapse;font-size:12px}
+.tmt th{background:var(--b);padding:4px 8px;text-align:left;font-size:11px;color:var(--t2)}
+.tmt td{padding:4px 8px;border-bottom:1px solid var(--b);white-space:nowrap}
+/* Day entries */
+.day-label{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--t3);padding:4px 0 8px;border-bottom:1px solid var(--b);margin-bottom:10px}
+.day-item{margin-bottom:6px;border:1px solid var(--b);border-radius:12px;background:var(--white);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.day-item summary{list-style:none;cursor:pointer;padding:0;user-select:none;transition:background .15s}
+.day-item summary::-webkit-details-marker{display:none}
+.day-item summary:hover{background:#fafaf7}
+.day-item[open] summary{background:#fafaf7}
+.di{display:flex;align-items:center;gap:10px;padding:12px 14px}
+.di-date{flex-shrink:0;text-align:center;min-width:38px;display:flex;flex-direction:column;align-items:center}
+.di-n{font-size:17px;font-weight:700;line-height:1.1}.di-w{font-size:10px;color:var(--t3)}
+.di-icon{font-size:16px;flex-shrink:0}
+.di-title{font-size:14px;font-weight:600;flex:1;min-width:0;line-height:1.3}
+.di-acc{font-size:11px;color:var(--t3);white-space:nowrap;flex-shrink:0;margin-right:2px;max-width:110px;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:480px){.di-acc{display:none}}
+.di-chev{color:var(--t3);font-size:14px;transition:transform .2s;flex-shrink:0}
+.day-item[open] .di-chev{transform:rotate(90deg)}
+.di-body{padding:14px 14px 0;border-top:1px solid var(--b)}
+.di-desc{font-size:14px;color:var(--t2);line-height:1.75;margin-bottom:10px}
+.di-desc b{color:var(--tx)}.di-desc ul{padding-left:18px;margin-top:6px}.di-desc li{margin-bottom:4px}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.tag{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid}
+.t-fly{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+.t-train{background:#f0fdf4;color:#15803d;border-color:#bbf7d0}
+.t-bus{background:#fff7ed;color:#c2410c;border-color:#fed7aa}
+.t-boat{background:#ecfeff;color:#0e7490;border-color:#a5f3fc}
+.t-acc{background:#f5f3ff;color:#6d28d9;border-color:#ddd6fe}.t-acc a{color:inherit}
+.t-hut{background:#fef3c7;color:#92400e;border-color:#fde68a}
+.t-camp{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}
+.warn{background:#fff8e6;border-left:3px solid #f59e0b;border-radius:0 8px 8px 0;padding:8px 12px;font-size:13px;color:#92400e;margin-bottom:10px}
+
+/* ── route detail inside a day ── */
+details.rt{background:#f9f7f3;border:1px solid var(--b);border-radius:10px;margin:0 0 10px;box-shadow:none;overflow:hidden}
+details.rt>summary{padding:10px 14px;font-size:13px;font-weight:600;color:var(--tx);background:transparent}
+details.rt>summary:hover{background:#f2efe8}
+details.rt[open]>summary{border-bottom:1px solid var(--b)}
+.rt-in{padding:12px 14px}
+.rt-h{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
+.wp{list-style:none;margin:0;padding:0}
+.wp li{position:relative;padding:0 0 12px 20px;font-size:13.5px;line-height:1.5}
+.wp li:last-child{padding-bottom:0}
+.wp li::before{content:"";position:absolute;left:3px;top:6px;width:8px;height:8px;border-radius:50%;
+  background:var(--cc);box-shadow:0 0 0 2px #f9f7f3}
+.wp li::after{content:"";position:absolute;left:6.5px;top:16px;bottom:0;width:1px;background:var(--b2)}
+.wp li:last-child::after{display:none}
+.wp b{color:var(--tx);font-weight:600}
+.wp .zh{color:var(--t2)}
+.wp .mt{display:block;font-size:12px;color:var(--t3);margin-top:1px}
+.arc{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;margin-top:4px}
+.arc span{background:var(--white);border:1px solid var(--b);border-radius:20px;padding:3px 10px;white-space:nowrap}
+.arc i{color:var(--t3);font-style:normal}
+.shot{font-size:13px;color:var(--t2);line-height:1.7;margin-top:10px;padding-top:10px;border-top:1px dashed var(--b2)}
+.shot b{color:var(--tx)}
+
+
+.figref{margin:12px 0;border:1px solid var(--b);border-radius:10px;overflow:hidden;background:#fff;cursor:zoom-in}
+.figref img{width:100%;display:block}
+.figref figcaption{font-size:12px;color:var(--t3);padding:7px 12px;border-top:1px solid var(--b);line-height:1.5}
+
+/* Photos + Lightbox */
+.photo-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 14px}
+.photo-row:has(.pf.has-photo){padding-bottom:14px}
+.photo-row::-webkit-scrollbar{display:none}
+.pf{display:none;position:relative;width:250px;height:167px;transition:width .2s;flex-shrink:0;margin:0;border-radius:9px;overflow:hidden;background:#cfc9bf}
+.pf.has-photo{display:block}
+.pf.portrait{width:125px}
+.pf.square{width:167px}
+.pi{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in;border:0}
+.pf:has(.pi[src]):hover .pi{opacity:.9}
+.pi:not([src]){visibility:hidden}
+.pi[src]{animation:fadein .35s ease}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.pi:hover{opacity:.86}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;display:none;align-items:center;justify-content:center}
+#lb.on{display:flex}
+#lb-img{max-width:94vw;max-height:90vh;border-radius:8px;object-fit:contain;box-shadow:0 8px 40px rgba(0,0,0,.8);cursor:default}
+#lb-close{position:fixed;top:14px;right:20px;color:#fff;font-size:34px;cursor:pointer;line-height:1;z-index:10001;opacity:.85}
+#lb-close:hover{opacity:1}
+#lb-count{position:fixed;bottom:18px;left:0;right:0;text-align:center;color:rgba(255,255,255,.6);font-size:13px;letter-spacing:1px}
+.lb-nav{position:fixed;top:50%;transform:translateY(-50%);z-index:10001;width:52px;height:52px;border:0;border-radius:50%;
+  background:rgba(255,255,255,.12);color:#fff;font-size:34px;line-height:1;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;padding:0 0 4px;transition:background .15s,opacity .15s}
+.lb-nav:hover{background:rgba(255,255,255,.24)}
+.lb-nav[disabled]{opacity:0;pointer-events:none}
+#lb-prev{left:16px}
+#lb-next{right:16px}
+@media(max-width:600px){.lb-nav{width:44px;height:44px;font-size:28px}#lb-prev{left:6px}#lb-next{right:6px}}
+.foot{padding:32px 20px;text-align:center;font-size:12px;color:var(--t3);border-top:1px solid var(--b);margin-top:40px}
+</style>
+</head>
+<body>
+
+<nav class="topnav" id="topnav">
+  <span class="nav-brand">歐洲 2026</span><span class="nav-sep"></span>
+  <div class="nav-pills">
+    <a class="np" href="#sc" style="--vc:var(--sc);--vbg:var(--sc-bg)">🏴󠁧󠁢󠁳󠁣󠁴󠁿 蘇格蘭</a>
+    <a class="np" href="#is" style="--vc:var(--is);--vbg:var(--is-bg)">🇮🇸 冰島</a>
+    <a class="np" href="#fa" style="--vc:var(--fa);--vbg:var(--fa-bg)">🇫🇴 法羅</a>
+    <a class="np" href="#ed" style="--vc:var(--ed);--vbg:var(--ed-bg)">🏴󠁧󠁢󠁳󠁣󠁴󠁿 愛丁堡</a>
+    <a class="np" href="#ir" style="--vc:var(--ir);--vbg:var(--ir-bg)">🇮🇪 愛爾蘭</a>
+    <a class="np" href="#it" style="--vc:var(--it);--vbg:var(--it-bg)">🇮🇹 義大利</a>
+  </div>
+</nav>
+<button class="btt" id="btt" onclick="window.scrollTo({top:0,behavior:'scroll'})">↑</button>
+<!-- Lightbox -->
+<div id="lb" onclick="if(event.target===this)closeLb()">
+  <span id="lb-close" onclick="closeLb()">✕</span>
+  <button id="lb-prev" class="lb-nav" onclick="event.stopPropagation();stepLb(-1)" aria-label="上一張">‹</button>
+  <img id="lb-img" alt="">
+  <button id="lb-next" class="lb-nav" onclick="event.stopPropagation();stepLb(1)" aria-label="下一張">›</button>
+  <div id="lb-count"></div>
+</div>
+<!-- Hero -->
+<div class="site-hero" id="overview">
+  <img class="hero-photo" src="images/hero.jpg" alt="">
+  <div class="hero-content">
+    <div class="hero-kicker">EUROPE · 2026</div>
+    <h1 class="hero-h1">歐洲之旅 2026</h1>
+    <div class="hero-accent"></div>
+    <div class="hero-dates">8月 13日 — 9月 26日 · 44天</div>
+    <div class="hero-locs">Scotland · Iceland · Faroe Islands · Edinburgh · Dublin · Dolomiti</div>
+  </div>
+  <div class="hero-wave">
+    <svg viewBox="0 0 1440 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="display:block;width:100%;height:56px">
+      <path d="M0,20 Q240,56 480,32 Q720,8 960,40 Q1200,56 1440,20 L1440,56 L0,56 Z" fill="#f8f6f2"/>
+    </svg>
+  </div>
+</div>
+<div class="wrap"><div class="sec-row"><span class="sec-num">01</span><span class="sec-title">行程總覽</span><span class="sec-hint">· 點任一列跳往各國</span></div>
+<div class="ov-wrap"><div class="ov-head"><span>日期</span><span>地區 · 行程亮點</span></div><div class="ov-row" onclick="document.getElementById('sc').scrollIntoView({behavior:'smooth'})"><div><span class="ov-date" style="color:var(--sc)">8/13–8/19</span><span class="ov-days">7天</span></div><div><div class="ov-main">🏴󠁧󠁢󠁳󠁣󠁴󠁿&nbsp;蘇格蘭</div><div class="ov-sub">West Highland Way · Glenfinnan 哈利波特橋 · Loch Ossian 秘境</div></div></div><div class="ov-row" onclick="document.getElementById('is').scrollIntoView({behavior:'smooth'})"><div><span class="ov-date" style="color:var(--is)">8/20–8/29</span><span class="ov-days">10天</span></div><div><div class="ov-main">🇮🇸&nbsp;冰島</div><div class="ov-sub">Laugavegur 縱走 · Fimmvörðuháls · 冰河健行</div></div></div><div class="ov-row" onclick="document.getElementById('fa').scrollIntoView({behavior:'smooth'})"><div><span class="ov-date" style="color:var(--fa)">8/30–9/6</span><span class="ov-days">8天</span></div><div><div class="ov-main">🇫🇴&nbsp;法羅群島</div><div class="ov-sub">海上懸湖 · Mykines 海鸚 · 007島 · Gjógv 峽谷村</div></div></div><div class="ov-row" onclick="document.getElementById('ed').scrollIntoView({behavior:'smooth'})"><div><span class="ov-date" style="color:var(--ed)">9/7–9/9</span><span class="ov-days">3天</span></div><div><div class="ov-main">🏴󠁧󠁢󠁳󠁣󠁴󠁿&nbsp;愛丁堡</div><div class="ov-sub">城堡 · Royal Mile · 亞瑟王座 · 威士忌</div></div></div><div class="ov-row" onclick="document.getElementById('ir').scrollIntoView({behavior:'smooth'})"><div><span class="ov-date" style="color:var(--ir)">9/10–9/12</span><span class="ov-days">3天</span></div><div><div class="ov-main">🇮🇪&nbsp;愛爾蘭</div><div class="ov-sub">都柏林 · Trinity College · Temple Bar</div></div></div><div class="ov-row" onclick="document.getElementById('it').scrollIntoView({behavior:'smooth'})"><div><span class="ov-date" style="color:var(--it)">9/13–9/25</span><span class="ov-days">13天</span></div><div><div class="ov-main">🇮🇹&nbsp;義大利</div><div class="ov-sub">威尼斯 · 三峰山 · Via Ferrata · Seceda · 米蘭</div></div></div></div></div>
+
+<div class="c-wave" style="background:var(--sc-bg)"><svg viewBox="0 0 1440 48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="display:block;width:100%;height:48px"><path d="M0,0 Q360,48 720,24 Q1080,0 1440,36 L1440,0 Z" fill="#f8f6f2"/></svg></div><section class="country-sec" id="sc" style="--cc:var(--sc);background:var(--sc-bg)"><div class="c-top-bar"></div><div class="wrap"><div class="c-header"><span class="c-flag">🏴󠁧󠁢󠁳󠁣󠁴󠁿</span><div><div class="c-name" style="color:var(--sc)">蘇格蘭 Scotland</div><div class="c-en">SCOTTISH HIGHLANDS · WEST HIGHLAND WAY</div><span class="c-period">8月 13日 — 8月 19日 · 7天</span></div></div><div class="c-cards"><div class="cc"><div class="cc-lb">⏰ 時差 <span class="cc-dim">BST / UTC+1</span></div><div class="cc-tz"><div class="tz-row"><span class="tz-flag">🇹🇼</span><span class="tz-time">台灣 14:00 → 當地 07:00</span></div><div class="tz-row"><span class="tz-flag">📍</span><span class="tz-time">台灣 23:00 → 當地 16:00</span></div></div></div><div class="cc"><div class="cc-lb">🌡️ 氣溫</div><div class="cc-val">11–19°C</div><div class="cc-sub">山區更低，多雲多雨<br>必備雨衣 + 防風層</div></div><div class="cc"><div class="cc-lb">💷 貨幣</div><div class="cc-val">英鎊 GBP</div><div class="cc-sub">1 GBP ≈ 42 TWD</div></div><div class="cc cc-warn"><div class="cc-lb">⚠️ 關鍵提醒</div><div class="cc-warn-body">手提限 <b>7kg</b>（出發日）<br>大行李寄放 <b>BOUNCE</b>（Glasgow）<br>步道天氣多變，雨衣必備</div></div></div><details style="--cc:var(--sc)"><summary>📚 蘇格蘭 &amp; WHW 深度介紹 <span class="chev">›</span></summary><div class="det-in">
+<details class="sub"><summary>🏔 蘇格蘭高地文化 <span class="chev">›</span></summary><div class="det-in">
+<p class="kp"><b>洛蒙湖（Loch Lomond）</b>英國最大淡水湖；<b>高地清空（Highland Clearances）</b>18世紀農民被迫遷離；<b>傑科拜特起義（1745年）</b>卡洛登戰役後蓋爾文化大滅絕。<br>🍺 必吃：Haggis 雜碎布丁 · Irn-Bru 橙色汽水 · 單一麥芽威士忌</p>
+</div></details>
+<details class="sub"><summary>🥾 West Highland Way 路線介紹 <span class="chev">›</span></summary><div class="det-in">
+<p class="kp">蘇格蘭<b>第一條官方長距離步道（1980年）</b>，全長 <b>154 km</b>，從 Milngavie 至 Fort William。此行走最精彩的核心段：Bridge of Orchy → Kingshouse → Kinlochleven，翻越全線最高點魔鬼階梯（539m）。</p>
+<div class="map-box"><div class="lmap" id="lmap-whw"></div></div>
+<table class="stg"><thead><tr><th>日期</th><th>路段</th><th>距離</th><th>爬升</th><th>時間</th></tr></thead><tbody>
+<tr><td><span class="sb" style="background:var(--sc-bg);color:var(--sc)">8/14</span></td><td>Balmaha → Conic Hill 往返</td><td>7.8 km</td><td>+361m</td><td>2.5–3h</td></tr>
+<tr><td><span class="sb" style="background:var(--sc-bg);color:var(--sc)">8/15</span></td><td>Bridge of Orchy → Kingshouse</td><td>19 km</td><td>+350m</td><td>5–6h</td></tr>
+<tr><td><span class="sb" style="background:var(--sc-bg);color:var(--sc)">8/16</span></td><td>Kingshouse → Kinlochleven</td><td>14.5 km</td><td>+500m</td><td>4–5h</td></tr>
+</tbody></table>
+</div></details>
+<details class="sub"><summary>🗣 地名發音指南 <span class="chev">›</span></summary><div class="det-in">
+<div class="pron-grid">
+<div class="pc"><div class="p-en">Milngavie</div><div class="p-zh">米爾恩加維（起點）</div><div class="p-ipa">/ MIL-guy /</div></div>
+<div class="pc"><div class="p-en">Crianlarich</div><div class="p-zh">克里安拉里奇</div><div class="p-ipa">/ kree-an-LAR-ikh /</div></div>
+<div class="pc"><div class="p-en">Loch Lomond</div><div class="p-zh">洛蒙湖</div><div class="p-ipa">/ LOKH LO-mund /</div></div>
+<div class="pc"><div class="p-en">Rannoch Moor</div><div class="p-zh">拉諾克荒原</div><div class="p-ipa">/ RAN-okh MOOR /</div></div>
+<div class="pc"><div class="p-en">Kingshouse</div><div class="p-zh">金斯豪斯旅館</div><div class="p-ipa">/ KINGZ-house /</div></div>
+<div class="pc"><div class="p-en">Glencoe</div><div class="p-zh">格倫科（峽谷）</div><div class="p-ipa">/ glen-KOH /</div></div>
+<div class="pc"><div class="p-en">Kinlochleven</div><div class="p-zh">金洛克利文</div><div class="p-ipa">/ kin-LOKH-lee-ven /</div></div>
+<div class="pc"><div class="p-en">Glenfinnan</div><div class="p-zh">格倫芬南（火車橋）</div><div class="p-ipa">/ glen-FIN-un /</div></div>
+<div class="pc"><div class="p-en">Corrour</div><div class="p-zh">科勞爾（最偏遠車站）</div><div class="p-ipa">/ ko-ROOR /</div></div>
+<div class="pc"><div class="p-en">Loch Ossian</div><div class="p-zh">歐欣湖（秘境青旅）</div><div class="p-ipa">/ LOKH OSH-un /</div></div>
+</div>
+<p class="kp" style="font-size:13px;margin-top:8px">💡 <b>Loch</b> ch 唸喉音 /kh/（類德語 Bach），不是 /k/。</p>
+</div></details>
+</div></details>
+<details style="--cc:var(--sc)"><summary>📋 實用資訊 <span class="chev">›</span></summary><div class="det-in"><div class="info-grid">
+<div class="ic"><div class="ic-lb">🚨 緊急電話</div><div class="ic-bd"><b style="font-size:18px">999 / 112</b><br>山地救援：<b>999</b></div></div>
+<div class="ic"><div class="ic-lb">📱 App</div><div class="ic-bd"><span class="atag">ScotRail</span><span class="atag">Citylink</span><span class="atag">OS Maps</span><span class="atag">what3words</span></div></div>
+<div class="ic"><div class="ic-lb">🚌 交通查詢</div><div class="ic-bd"><a href="https://www.citylink.co.uk" target="_blank">citylink.co.uk</a> · <a href="https://www.ember.to" target="_blank">ember.to</a><br><a href="https://www.scotrail.co.uk" target="_blank">scotrail.co.uk</a></div></div>
+<div class="ic"><div class="ic-lb">🚍 Glasgow→Crianlarich</div><div class="ic-bd"><table class="tmt"><thead><tr><th>業者</th><th>出發</th><th>抵達</th></tr></thead><tbody>
+<tr><td>Citylink 914</td><td>06:40</td><td>08:37</td></tr>
+<tr><td>Ember E5</td><td>08:00</td><td>09:44</td></tr>
+<tr><td>Citylink 915</td><td>08:50</td><td>10:37</td></tr>
+</tbody></table></div></div>
+</div></div></details>
+<div class="day-label">每日行程</div><details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/13</span><span class="di-w">四</span></div><span class="di-icon">✈️</span><span class="di-title">台北出發 → 杜拜 → 格拉斯哥</span><span class="di-acc">格拉斯哥青旅</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">深夜桃園起飛，在<b>杜拜（Dubai）</b>轉機後飛抵格拉斯哥，搭機場巴士進市中心。</p><div class="tags"><span class="tag t-fly">✈️ EK387 台北→杜拜 00:30/05:15</span><span class="tag t-fly">✈️ EK027 杜拜→格拉斯哥 07:50/12:40</span></div><div class="tags"><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Revolve+Glasgow+Hostel" target="_blank">Revolve Glasgow 青旅</a></span></div><div class="photo-row" data-day="0813" data-tint="background:linear-gradient(145deg,#12301c,#2f6b46)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/14</span><span class="di-w">五</span></div><span class="di-icon">⛰️</span><span class="di-title">Conic Hill 健行 · 洛蒙湖 → 克里安拉里奇</span><span class="di-acc">Crianlarich 青旅</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">行李寄放後前往 <b>Balmaha（巴爾馬哈）</b>健行 <b>Conic Hill（科尼克山）</b>來回 7.8km，爬升 361m。山頂俯瞰洛蒙湖（Loch Lomond）全景。</p><details class="rt"><summary>🥾 今日路線 · 7.8 km 往返 / 2.5–3h / +361m<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Balmaha</b> <span class="zh">巴爾馬哈</span><span class="mt">洛蒙湖東岸小村 · 遊客中心可補水</span></li><li><b>Conic Hill 步道口</b> <span class="zh">科尼克山登山口</span><span class="mt">穿過橡樹林緩上</span></li><li><b>Conic Hill 山頂</b> <span class="zh">科尼克山</span><span class="mt">361m · <b>正好座落在高地斷層線上</b></span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>🌳 橡木林</span><i>→</i><span>🌾 開闊草坡</span><i>→</i><span>🏞️ 湖島全景</span></div><div class="shot">📸 <b>值得拍</b>：<b>山頂稜線</b>——洛蒙湖 30 多座冰磧島一字排開，天氣好時能看到島嶼連成一線（那就是斷層線的走向）· 綿羊與湖景同框</div></div></details><div class="tags"><span class="tag t-bus">🚌 Glasgow→Balmaha</span><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Crianlarich+Youth+Hostel" target="_blank">Crianlarich Youth Hostel</a></span></div><div class="photo-row" data-day="0814" data-tint="background:linear-gradient(145deg,#12301c,#2f6b46)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/15</span><span class="di-w">六</span></div><span class="di-icon">⛰️</span><span class="di-title">WHW D1 · Bridge of Orchy → Kingshouse 19km</span><span class="di-acc">Kingshouse Hotel</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">穿越廣袤的 <b>Rannoch Moor（拉諾克荒原）</b>——英國最荒涼高沼地，面積 130km²。<b>19 km · 5–6h · 爬升 350m</b></p><details class="rt"><summary>🥾 今日路線 · 19 km / 5–6h / +350m<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Bridge of Orchy</b> <span class="zh">布里奇歐基</span><span class="mt">車站起步，先爬 Màm Carraigh 小丘</span></li><li><b>Inveroran</b> <span class="zh">因弗奧蘭</span><span class="mt">下到湖畔小旅館，最後的補給點</span></li><li><b>Rannoch Moor</b> <span class="zh">拉諾克荒原</span><span class="mt"><b>130 km² 泥炭荒原</b>，走在 19 世紀軍用道上</span></li><li><b>Ba Bridge</b> <span class="zh">巴橋</span><span class="mt">荒原正中央的石拱橋，經典休息點</span></li><li><b>Kingshouse</b> <span class="zh">金斯豪斯</span><span class="mt">300 年歷史旅館 · Buachaille Etive Mòr 就在正對面</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>🌲 松林小丘</span><i>→</i><span>🏞️ 湖畔</span><i>→</i><span>🟤 無盡荒原</span><i>→</i><span>⛰️ 峽谷入口</span></div><div class="shot">📸 <b>值得拍</b>：<b>Ba Bridge</b>——石橋、溪流與荒原地平線 · <b>抵達 Kingshouse 前最後 3 km</b>：Buachaille Etive Mòr 金字塔形山體正面迎來，是全蘇格蘭最上鏡的一座山，黃昏光線最好</div></div></details><div class="tags"><span class="tag t-bus">🚌 Crianlarich→Bridge of Orchy</span><span class="tag t-acc">🏨 <a href="https://maps.google.com/?q=Kingshouse+Hotel+Glencoe" target="_blank">Kingshouse Hotel</a>（含早餐）</span></div><div class="photo-row" data-day="0815" data-tint="background:linear-gradient(145deg,#12301c,#2f6b46)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/16</span><span class="di-w">日</span></div><span class="di-icon">⛰️</span><span class="di-title">WHW D2 · Devil's Staircase → 威廉堡</span><span class="di-acc">Glen Nevis 青旅</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">翻越 <b>Devil's Staircase（魔鬼階梯，539m）</b>全線最高點，Glencoe 峽谷盡收眼底。下山至 Kinlochleven 搭巴士。<b>14.5 km · 4–5h</b></p><details class="rt"><summary>🥾 今日路線 · 14.5 km / 4–5h / +500m<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Kingshouse</b> <span class="zh">金斯豪斯</span><span class="mt">沿 Glencoe 谷底西行</span></li><li><b>Altnafeadh</b> <span class="zh">阿爾特納費</span><span class="mt">魔鬼階梯登山口</span></li><li><b>Devil's Staircase</b> <span class="zh">魔鬼階梯</span><span class="mt"><b>全線最高點 549m</b> · 之字形陡上，18 世紀築路工人取的名字</span></li><li><b>Blackwater Reservoir</b> <span class="zh">黑水水庫</span><span class="mt">下坡途中的高地水庫展望</span></li><li><b>Kinlochleven</b> <span class="zh">金洛克利文</span><span class="mt">終點 · 有商店可補給</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>⛰️ 峽谷底</span><i>→</i><span>🪜 之字陡上</span><i>→</i><span>🏔️ 制高點</span><i>→</i><span>💧 水庫下坡</span></div><div class="shot">📸 <b>值得拍</b>：<b>魔鬼階梯頂端</b>——回望 Glencoe 三姊妹峰與 Buachaille Etive Mòr，全線最戲劇性的一眼 · 天氣好時可遠眺 Ben Nevis（英國最高峰）</div></div></details><div class="tags"><span class="tag t-bus">🚌 Kinlochleven→Fort William</span><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Glen+Nevis+Youth+Hostel+Fort+William" target="_blank">Glen Nevis Youth Hostel</a>（2晚）</span></div><div class="photo-row" data-day="0816" data-tint="background:linear-gradient(145deg,#12301c,#2f6b46)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/17</span><span class="di-w">一</span></div><span class="di-icon">🚂</span><span class="di-title">威廉堡 · Glenfinnan 哈利波特蒸汽火車橋</span><span class="di-acc">Glen Nevis 青旅</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc"><b>Glenfinnan Viaduct（格蘭芬南高架橋）</b>建於 1901 年，21座拱橋，《哈利波特》霍格華茲列車取景地。<b>Glenfinnan Monument</b> 為 1745 年傑科拜特起義紀念碑。</p><div class="tags"><span class="tag t-bus">🚌 Bus #500 Fort William→Glenfinnan 08:15/08:48</span><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Glen+Nevis+Youth+Hostel+Fort+William" target="_blank">Glen Nevis Youth Hostel</a>（續住）</span></div><div class="photo-row" data-day="0817" data-tint="background:linear-gradient(145deg,#12301c,#2f6b46)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/18</span><span class="di-w">二</span></div><span class="di-icon">🚂</span><span class="di-title">威廉堡 → Corrour → Loch Ossian 秘境山屋</span><span class="di-acc">Loch Ossian 青旅</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">搭火車至英國最偏遠有人車站 <b>Corrour（科勞爾）</b>——四周無公路。步行 1.5km 抵達太陽能供電的 <b>Loch Ossian Youth Hostel</b>，翡翠色湖水倒映高山。</p><div class="tags"><span class="tag t-train">🚂 ScotRail FW→Corrour 11:40/12:30（座位 A44A）</span><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Loch+Ossian+Youth+Hostel" target="_blank">Loch Ossian Youth Hostel</a></span></div><div class="photo-row" data-day="0818" data-tint="background:linear-gradient(145deg,#12301c,#2f6b46)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/19</span><span class="di-w">三</span></div><span class="di-icon">🚂</span><span class="di-title">Corrour → 格拉斯哥 · 取大行李</span><span class="di-acc">格拉斯哥青旅</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">搭火車返抵格拉斯哥，取回 8/14 寄放的大行李，洗烘衣物，明日飛冰島。</p><div class="tags"><span class="tag t-train">🚂 Corrour→Glasgow 12:30/15:34（D32B）</span><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Revolve+Glasgow+Hostel" target="_blank">Revolve Glasgow 青旅</a></span></div><div class="warn">⚠️ 明日行李手提限 7kg（注意！FI300 法羅航線也限 6kg）</div><div class="photo-row" data-day="0819" data-tint="background:linear-gradient(145deg,#12301c,#2f6b46)"></div></div></details>
+</div></section>
+
+<div class="c-wave" style="background:var(--is-bg)"><svg viewBox="0 0 1440 48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="display:block;width:100%;height:48px"><path d="M0,0 Q360,48 720,24 Q1080,0 1440,36 L1440,0 Z" fill="#f8f6f2"/></svg></div><section class="country-sec" id="is" style="--cc:var(--is);background:var(--is-bg)"><div class="c-top-bar"></div><div class="wrap"><div class="c-header"><span class="c-flag">🇮🇸</span><div><div class="c-name" style="color:var(--is)">冰島 Iceland · Ísland</div><div class="c-en">LAUGAVEGUR · FIMMVÖRÐUHÁLS · SKAFTAFELL</div><span class="c-period">8月 20日 — 8月 29日 · 10天</span></div></div><div class="c-cards"><div class="cc"><div class="cc-lb">⏰ 時差 <span class="cc-dim">GMT / UTC+0</span></div><div class="cc-tz"><div class="tz-row"><span class="tz-flag">🇹🇼</span><span class="tz-time">台灣 15:00 → 當地 07:00</span></div><div class="tz-row"><span class="tz-flag">📍</span><span class="tz-time">台灣 23:00 → 當地 15:00</span></div></div></div><div class="cc"><div class="cc-lb">🌡️ 氣溫</div><div class="cc-val">8–15°C</div><div class="cc-sub">山區接近 0°C，強風多雨<br>備雨衣、手套、帽子</div></div><div class="cc"><div class="cc-lb">💴 貨幣</div><div class="cc-val">冰島克朗 ISK</div><div class="cc-sub">1 ISK ≈ 0.22 TWD</div></div><div class="cc cc-warn"><div class="cc-lb">⚠️ 關鍵提醒</div><div class="cc-warn-body">大行李寄放 <b>BOUNCE</b>（Reykjavík）<br>山屋多已訂好，<b>Þórsmörk 那晚尚未訂</b><br>山屋只收<b>現金</b>（備足ISK）<br>行前登記 <a href='https://safetravel.is' target='_blank'>safetravel.is</a></div></div></div><details style="--cc:var(--is)"><summary>📚 冰島 &amp; Laugavegur 縱走深度介紹 <span class="chev">›</span></summary><div class="det-in">
+<details class="sub"><summary>🌋 關於冰島 — 火與冰之島 <span class="chev">›</span></summary><div class="det-in">
+<p class="kp">冰島位於<b>北大西洋中脊</b>上，超過 130 座火山，地熱泉（geyser 一詞源自 Geysir）遍布。人口僅 37 萬，雷克雅維克是全球最北首都。<br>💡 字母：<b>þ</b>=th（think）；<b>ð</b>=th（the）；<b>á</b>=/ow/；<b>ö</b>=ö（嘴圓發）<br>🍲 必吃：Skyr 高蛋白優格 · 熱狗（remoulade 醬）· Kjötsúpa 羊肉湯</p>
+</div></details>
+<details class="sub"><summary>🥾 Laugavegur + Fimmvörðuháls — 這是一條什麼樣的路 <span class="chev">›</span></summary><div class="det-in">
+<p class="kp"><b>Laugavegur</b>（意為「溫泉之路」）55 km，是冰島唯一一條穿越內陸高地的長程步道。之所以世界知名，是因為它在短短四天內把冰島幾乎所有地貌<b>依序串成一條線</b>——沒有別的步道能做到這件事。</p>
+<p class="kp"><b>地質怎麼來的：</b>整條路走在 <b>Torfajökull 火山系統</b>上。這裡的岩石是<b>流紋岩（rhyolite）</b>，含鐵、硫等礦物在氧化過程中呈現紅、黃、綠、粉的色澤——這就是「彩色山丘」的由來。而黑色的部分是後期噴發的<b>黑曜石與玄武岩熔岩</b>，其中 Laugahraun 熔岩原年僅 <b>1477 年</b>形成，以地質尺度來說幾乎是昨天的事。</p>
+<p class="kp"><b>四天的地形大架構：</b></p>
+<div class="arc" style="margin:0 0 12px">
+  <span>🌈 彩色流紋岩</span><i>→</i><span>❄️ 雪原冰斗</span><i>→</i><span>💚 湖泊綠地</span><i>→</i><span>🖤 黑砂沙漠</span><i>→</i><span>🏜️ 火山峽谷</span><i>→</i><span>🌲 樺木森林</span>
+</div>
+<p class="kp">接續的 <b>Fimmvörðuháls</b> 22 km 則是另一種故事：從雷神谷爬上兩座冰河之間的鞍部，穿過 <b>2010 年 Eyjafjallajökull 噴發</b>形成的全新熔岩地（當年癱瘓全歐空運的那次），再沿 23 條瀑布一路降到南岸。</p>
+<figure class="figref"><img src="images/laugavegur-profile.jpg" alt="Laugavegur 高度剖面與路線圖" loading="lazy" onclick="showLb(this)"><figcaption>Laugavegur 55 km 高度剖面與衛星路線圖 · 點擊放大看各段距離與升降 （底圖：National Land Survey of Iceland / Google Satellite）</figcaption></figure><div class="map-box"><div class="lmap" id="lmap-laug"></div></div>
+<table class="stg"><thead><tr><th>天</th><th>路段</th><th>距離</th><th>地形主題</th></tr></thead><tbody>
+<tr><td><span class="sb" style="background:var(--is-bg);color:var(--is)">D1</span>8/22</td><td>Landmannalaugar→Hrafntinnusker</td><td>12 km<br><small>+530 / −80 m</small></td><td>彩色山丘 · 地熱</td></tr>
+<tr><td><span class="sb" style="background:var(--is-bg);color:var(--is)">D2</span>8/23</td><td>→Álftavatn→Hvanngil</td><td>15.8 km<br><small>+240 / −680 m</small></td><td>雪原 · 湖泊 · 渡溪</td></tr>
+<tr><td><span class="sb" style="background:var(--is-bg);color:var(--is)">D3</span>8/24</td><td>→Botnar / Emstrur</td><td>12.2 km<br><small>+90 / −190 m</small></td><td>黑砂沙漠 · 大峽谷</td></tr>
+<tr><td><span class="sb" style="background:var(--is-bg);color:var(--is)">D4</span>8/25</td><td>→Þórsmörk 🎉</td><td>15 km<br><small>+350 / −600 m</small></td><td>渡河 · 樺木林</td></tr>
+<tr><td><span class="sb" style="background:#ede9fe;color:#6d28d9">D5</span>8/26</td><td>→Baldvinsskáli</td><td>16km +900m</td><td>窄稜 · 2010 新生熔岩</td></tr>
+<tr><td><span class="sb" style="background:#ede9fe;color:#6d28d9">D6</span>8/27</td><td>→Skógar</td><td>8km -800m</td><td>23 瀑布走廊</td></tr>
+</tbody></table>
+<p class="kp" style="font-size:13px"><b>Þórsmörk = Thor's Valley（雷神谷）</b>：名字來自北歐雷神索爾。三座冰河（Eyjafjallajökull、Mýrdalsjökull、Tindfjallajökull）在此圍出一個避風的谷地，因此成為冰島少數長得出樺木林的地方——<b>火山、森林、冰河、綠谷四種地貌在此交會</b>，也是 Laugavegur 的終點。</p>
+</div></details>
+<details class="sub"><summary>🛖 山屋系統與實務 <span class="chev">›</span></summary><div class="det-in">
+<p class="kp">全線山屋由冰島登山協會 <b>Ferðafélag Íslands</b> 營運。每間提供通鋪床位、公用廚房（<b>需自備炊具與食物</b>）、乾式廁所。山屋管理員每日駐守，可詢問路況與渡溪水位。</p>
+<p class="kp"><b>必須知道的幾件事：</b><br>
+• <b>只收現金</b>——高地無網路訊號，刷卡機不可靠，備足 ISK<br>
+• <b>無電力</b>（Hrafntinnusker、Hvanngil、Emstrur、Baldvinsskáli）——行動電源要帶足六天<br>
+• 熱水多半要付費，飲用水可直接取自溪流<br>
+• 睡袋自備，山屋不提供寢具<br>
+• 渡溪：<b>脫鞋或穿溯溪鞋，勿穿登山靴涉水</b>；水位午後因冰河融水上升，越早過越安全</p>
+<div class="warn">⚠️ 天氣是高地最大變數——晴天 15°C 與風雨 2°C 可能發生在同一天。防風雨層、手套、帽子屬必要裝備，不是備用。</div>
+</div></details>
+<details class="sub"><summary>🗣 冰島地名發音指南 <span class="chev">›</span></summary><div class="det-in">
+<div class="pron-grid">
+<div class="pc"><div class="p-en">Reykjavík</div><div class="p-zh">雷克雅維克</div><div class="p-ipa">/ RAKE-ya-vēk /</div></div>
+<div class="pc"><div class="p-en">Landmannalaugar</div><div class="p-zh">蘭德曼納洛伊加（起點）</div><div class="p-ipa">/ LAHND-man-na-LOY-gar /</div></div>
+<div class="pc"><div class="p-en">Hrafntinnusker</div><div class="p-zh">拉夫廷努斯克爾（D1山屋）</div><div class="p-ipa">/ HRAPF-tin-nus-ker /</div></div>
+<div class="pc"><div class="p-en">Alftavatn</div><div class="p-zh">阿爾夫塔瓦特恩（天鵝湖）</div><div class="p-ipa">/ ALF-ta-vatn /</div></div>
+<div class="pc"><div class="p-en">Þórsmörk</div><div class="p-zh">索斯默克（托爾之森）</div><div class="p-ipa">/ THORS-merk /</div></div>
+<div class="pc"><div class="p-en">Eyjafjallajökull</div><div class="p-zh">艾雅法拉冰河</div><div class="p-ipa">/ AY-ya-fyat-la-YEU-kutl /</div></div>
+<div class="pc"><div class="p-en">Fimmvörðuháls</div><div class="p-zh">費姆費爾都豪斯</div><div class="p-ipa">/ FIM-ver-du-howls /</div></div>
+<div class="pc"><div class="p-en">Skógafoss</div><div class="p-zh">斯科加瀑布（60m）</div><div class="p-ipa">/ SKOG-a-foss /</div></div>
+<div class="pc"><div class="p-en">Vatnajökull</div><div class="p-zh">瓦特納冰川（歐洲最大）</div><div class="p-ipa">/ VAHT-na-YEU-kutl /</div></div>
+<div class="pc"><div class="p-en">Hallgrímskirkja</div><div class="p-zh">哈爾格林斯教堂</div><div class="p-ipa">/ HATL-greems-keer-kya /</div></div>
+</div>
+<p class="kp" style="font-size:13px;margin-top:8px">💡 冰島語重音永遠在<b>第一音節</b>。ll 在字中常唸 /tl/。</p>
+</div></details>
+</div></details>
+<details style="--cc:var(--is)"><summary>📋 實用資訊 <span class="chev">›</span></summary><div class="det-in"><div class="info-grid">
+<div class="ic"><div class="ic-lb">🚨 緊急電話</div><div class="ic-bd"><b style="font-size:18px">112</b></div></div>
+<div class="ic"><div class="ic-lb">📱 App</div><div class="ic-bd"><span class="atag">112 Iceland</span><span class="atag">SafeTravel</span><span class="atag">Vedur</span>（天氣）</div></div>
+<div class="ic"><div class="ic-lb">🚌 高地巴士</div><div class="ic-bd"><a href="https://www.re.is" target="_blank">re.is</a><br>BSÍ→Landmannalaugar 07:00，提前 15 分鐘到</div></div>
+</div></div></details>
+<div class="day-label">每日行程</div><details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/20</span><span class="di-w">四</span></div><span class="di-icon">✈️</span><span class="di-title">格拉斯哥→雷克雅維克抵達</span><span class="di-acc">Bus Hostel</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">飛往冰島！入境後搭機場接駁至市中心青旅。</p><div class="tags"><span class="tag t-fly">✈️ EK3377 GLA→KEF 14:20/15:45</span><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Reykjavik+Bus+Hostel" target="_blank">Reykjavík Bus Hostel</a>（2晚）</span></div><div class="photo-row" data-day="0820" data-tint="background:linear-gradient(145deg,#102a45,#1d5580)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/21</span><span class="di-w">五</span></div><span class="di-icon">🏙️</span><span class="di-title">雷克雅維克市區 · 寄放大行李 7 天</span><span class="di-acc">Bus Hostel</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc"><b>Hallgrímskirkja 教堂</b>上塔俯瞰全城 · <b>Sun Voyager</b>海濱雕塑 · Bæjarins Beztu 熱狗 · Harpa 音樂廳。</p><div class="tags"><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Reykjavik+Bus+Hostel" target="_blank">Reykjavík Bus Hostel</a>（續住）</span></div><div class="warn">⚠️ 大行李今天交給 BOUNCE 寄放，縱走只帶必需品</div><div class="photo-row" data-day="0821" data-tint="background:linear-gradient(145deg,#102a45,#1d5580)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/22</span><span class="di-w">六</span></div><span class="di-icon">🌋</span><span class="di-title">Laugavegur D1 · Landmannalaugar→Hrafntinnusker</span><span class="di-acc">Hrafntinnusker山屋</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">高地巴士 4.5h 後抵達 <b>Landmannalaugar（蘭德曼納洛伊加）</b>——五彩流紋岩山丘，有天然地熱溫泉。開始 Laugavegur！<b>12km · 4–5h · +490m</b></p><details class="rt"><summary>🥾 今日路線 · 12 km / 4–5h / +490m<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Landmannalaugar</b> <span class="zh">蘭德曼納勞卡</span><span class="mt">起點 600m · 天然地熱溫泉、綠色巴士補給站</span></li><li><b>Laugahraun</b> <span class="zh">勞加熔岩原</span><span class="mt">1477年噴發的黑色黑曜石熔岩流，踩在上面沙沙作響</span></li><li><b>Brennisteinsalda</b> <span class="zh">彩虹山／硫磺山</span><span class="mt">855m · 全冰島最繽紛的山，紅黃綠藍交錯，硫磺噴氣孔就在步道旁</span></li><li><b>Stórihver</b> <span class="zh">斯托里赫韋爾</span><span class="mt">開闊地熱谷地，蒸氣從草地縫隙冒出</span></li><li><b>Hrafntinnusker</b> <span class="zh">黑曜石冰斗</span><span class="mt">1080m 山屋 · 全線最高宿點，四周雪原與黑曜石礫</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>🌈 彩色流紋岩</span><i>→</i><span>🖤 黑色熔岩原</span><i>→</i><span>♨️ 地熱噴氣</span><i>→</i><span>❄️ 雪原冰斗</span></div><div class="shot">📸 <b>值得拍</b>：<b>Brennisteinsalda 山腰</b>回望蘭德曼納勞卡營地全景（爬升約 1 小時處，最經典的一張）· <b>Laugahraun</b> 熔岩原與彩色山丘的黑／彩對比 · <b>Stórihver</b> 蒸氣逆光</div></div></details><div class="tags"><span class="tag t-bus">🚌 BSÍ→Landmannalaugar 07:00</span><span class="tag t-hut">🛖 <a href="https://maps.google.com/?q=Hrafntinnusker+hut+Iceland" target="_blank">Hrafntinnusker 山屋</a>（1080m · 現金）</span></div><div class="warn">📵 無電力、無熱水、無網路・現金結帳</div><div class="photo-row" data-day="0822" data-tint="background:linear-gradient(145deg,#102a45,#1d5580)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/23</span><span class="di-w">日</span></div><span class="di-icon">🌋</span><span class="di-title">Laugavegur D2 · Alftavatn天鵝湖→Hvanngil</span><span class="di-acc">Hvanngil山屋</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">全程最長。翠綠 <b>Alftavatn（天鵝湖）</b>倒映天空，後段黑色火山砂礫強風。<b>15.8km · 6–8h · +240 / −680m</b></p><details class="rt"><summary>🥾 今日路線 · 15.8 km / 6–8h / +240 / −680m<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Hrafntinnusker</b> <span class="zh">黑曜石冰斗</span><span class="mt">清晨出發，先橫切數道雪溝</span></li><li><b>Jökultungur</b> <span class="zh">冰河舌脊</span><span class="mt">陡下前的稜線，<b>整段最壯觀的展望點</b></span></li><li><b>Álftavatn</b> <span class="zh">阿爾夫塔湖（天鵝湖）</span><span class="mt">翠綠湖泊被黑色火山環抱，山屋可休息補水</span></li><li><b>Bratthálskvísl</b> <span class="zh">第一道渡溪</span><span class="mt">水深多在小腿，需脫鞋或穿溯溪鞋</span></li><li><b>Hvanngil</b> <span class="zh">赫萬吉爾</span><span class="mt">山屋 · 綠意峽谷中的避風處</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>❄️ 雪原</span><i>→</i><span>🏔️ 稜線大展望</span><i>→</i><span>💚 湖泊綠地</span><i>→</i><span>🌊 渡溪</span><i>→</i><span>🖤 黑砂平原</span></div><div class="shot">📸 <b>值得拍</b>：<b>Jökultungur 下坡起點</b>——Álftavatn 湖與遠方 Mýrdalsjökull 冰帽同時入鏡，全程最經典的一張 · 湖畔清晨無風時的<b>倒影</b></div></div></details><div class="tags"><span class="tag t-hut">🛖 <a href="https://maps.google.com/?q=Hvanngil+hut+Iceland" target="_blank">Hvanngil 山屋</a>（現金）</span></div><div class="photo-row" data-day="0823" data-tint="background:linear-gradient(145deg,#102a45,#1d5580)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/24</span><span class="di-w">一</span></div><span class="di-icon">🌋</span><span class="di-title">Laugavegur D3 · Hvanngil→Emstrur大峽谷</span><span class="di-acc">Emstrur 露營</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc"><b>Emstrur Canyon（Markarfljótsgljúfur）</b>——冰島版小大峽谷，黑色熔岩絕壁。<b>12.2km · 4–5h · +90 / −190m</b></p><details class="rt"><summary>🥾 今日路線 · 12.2 km / 4–5h / +90 / −190m<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Hvanngil</b> <span class="zh">赫萬吉爾</span><span class="mt">出發即渡 Kaldaklofskvísl 溪</span></li><li><b>Bláfjallakvísl</b> <span class="zh">藍山溪</span><span class="mt">架有便橋，不需涉水</span></li><li><b>Mælifellssandur</b> <span class="zh">黑砂平原</span><span class="mt">一望無際的火山黑砂，遠方 Mýrdalsjökull 冰帽鎮守</span></li><li><b>Markarfljótsgljúfur</b> <span class="zh">馬爾卡峽谷</span><span class="mt"><b>深 200m 的黑色熔岩大峽谷</b>，需繞行到觀景點</span></li><li><b>Emstrur (Botnar)</b> <span class="zh">埃姆斯特</span><span class="mt">營地 · 藏在小峽谷中避風</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>🖤 黑砂沙漠</span><i>→</i><span>🏔️ 冰帽遠景</span><i>→</i><span>🏜️ 深邃峽谷</span></div><div class="shot">📸 <b>值得拍</b>：<b>Markarfljótsgljúfur 峽谷觀景點</b>（從營地往北走 15 分鐘的岔路，強烈建議去）· 黑砂平原上<b>人與地景的比例感</b>，走在前方的隊友是最好的比例尺</div></div></details><div class="tags"><span class="tag t-camp">🏕 <a href="https://maps.google.com/?q=Emstrur+Botnar+hut+Iceland" target="_blank">Emstrur (Botnar) 營地</a>（現金）</span></div><div class="photo-row" data-day="0824" data-tint="background:linear-gradient(145deg,#102a45,#1d5580)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/25</span><span class="di-w">二</span></div><span class="di-icon">🌳</span><span class="di-title">Laugavegur D4 · Emstrur→Þórsmörk 🎉</span><span class="di-acc">Þórsmörk（尚未訂）</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">進入翠綠的 <b>Þórsmörk（索斯默克）</b>樺木林，完成 Laugavegur 55km！沿途多處過河，謹慎。<b>12.2km · 4–5h · +90 / −190m</b></p><details class="rt"><summary>🥾 今日路線 · 15 km / 5–6h · Laugavegur 完成 🎉<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Emstrur</b> <span class="zh">埃姆斯特</span><span class="mt">下切 Fremri-Emstruá 峽谷，過吊橋</span></li><li><b>Ljósártungur</b> <span class="zh">光河舌</span><span class="mt">地貌開始由荒漠轉為苔原綠</span></li><li><b>Þröngá</b> <span class="zh">þröngá 渡河</span><span class="mt"><b>全程最後也最深的一道渡溪</b>，水約及膝</span></li><li><b>Þórsmörk</b> <span class="zh">索斯默克（雷神谷）</span><span class="mt">終點 · 樺木林、營地、桑拿</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>🏜️ 火山荒漠</span><i>→</i><span>🌿 苔原轉綠</span><i>→</i><span>🌊 渡河</span><i>→</i><span>🌲 樺木森林</span></div><div class="shot">📸 <b>值得拍</b>：<b>Þröngá 渡河</b>——過河後回望，荒漠與綠谷的分界線就在腳下 · 進入樺木林後的<b>光影</b>，冰島難得有樹的地方</div></div></details><div class="tags"><span class="tag t-camp">🏕 <a href="https://maps.google.com/?q=Volcano+Huts+Thorsmork+Iceland" target="_blank">Þórsmörk Volcano Hut</a>（尚未訂）</span></div><div class="warn">⚠️ <b>此晚住宿尚未訂！</b>請盡快確認 Þórsmörk Volcano Hut 或 Húsadalur 營地</div><div class="photo-row" data-day="0825" data-tint="background:linear-gradient(145deg,#102a45,#1d5580)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/26</span><span class="di-w">三</span></div><span class="di-icon">🌋</span><span class="di-title">Fimmvörðuháls D1 · Þórsmörk→Baldvinsskáli</span><span class="di-acc">Baldvinsskáli山屋</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">穿越 2010 年 <b>Eyjafjallajökull 火山</b>噴發的新生熔岩帶——地球最年輕的地形。<b>16km · 6–8h · +900m</b></p><details class="rt"><summary>🥾 今日路線 · 16 km / 6–8h / +900m<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Þórsmörk</b> <span class="zh">雷神谷</span><span class="mt">從海拔 200m 起爬，一路上到 1000m</span></li><li><b>Kattarhryggir</b> <span class="zh">貓背稜</span><span class="mt"><b>刀刃狀窄脊</b>，兩側陡降，有鐵鍊輔助</span></li><li><b>Heljarkambur</b> <span class="zh">地獄稜</span><span class="mt">再一段暴露感強的窄稜</span></li><li><b>Magni & Móði</b> <span class="zh">馬格尼與莫迪火山口</span><span class="mt"><b>2010 年新生的兩座火山錐</b>，地面仍有餘溫</span></li><li><b>Baldvinsskáli</b> <span class="zh">巴爾德溫小屋</span><span class="mt">1000m 山屋 · 兩大冰河之間的鞍部</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>🌲 樺木林</span><i>→</i><span>⛰️ 窄稜暴露</span><i>→</i><span>🌋 2010新生熔岩</span><i>→</i><span>🧊 冰河鞍部</span></div><div class="shot">📸 <b>值得拍</b>：<b>Kattarhryggir 貓背稜</b>回望雷神谷（腎上腺素與美景並存）· <b>Magni 火山口</b>——踩在地球上最年輕的岩石之一，用手感受地面餘溫 · 鞍部同框 Eyjafjallajökull 與 Mýrdalsjökull 兩大冰河</div></div></details><div class="tags"><span class="tag t-hut">🛖 <a href="https://maps.google.com/?q=Baldvinsskali+hut+Fimmvorduhals" target="_blank">Baldvinsskáli 山屋</a>（現金）</span></div><div class="warn">📵 無電力 · 熔岩路面崎嶇，需登山靴</div><div class="photo-row" data-day="0826" data-tint="background:linear-gradient(145deg,#102a45,#1d5580)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/27</span><span class="di-w">四</span></div><span class="di-icon">💧</span><span class="di-title">23條瀑布下山→Skógar→Skaftafell 🎉</span><span class="di-acc">Skaftafell露營</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">23條瀑布相伴下山！<b>Skógafoss（60m）</b>晴天可見彩虹，完成6天77km縱走！<b>8km · 3–4h（全程下坡）</b></p><details class="rt"><summary>🥾 今日路線 · 8 km / 3–4h / -800m（全程下坡）<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Baldvinsskáli</b> <span class="zh">巴爾德溫小屋</span><span class="mt">清晨出發，沿 Skógá 河源頭下切</span></li><li><b>Skógá 河谷</b> <span class="zh">斯科加河谷</span><span class="mt"><b>連續 23 條瀑布</b>一路相伴，每轉一個彎就是一座</span></li><li><b>Skógafoss</b> <span class="zh">斯科加瀑布</span><span class="mt">終點 · 落差 60m、寬 25m，晴天必見彩虹</span></li><li><b>Skógar</b> <span class="zh">斯科加</span><span class="mt">巴士站 · 轉往 Skaftafell</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>🧊 冰河源頭</span><i>→</i><span>💧 23 瀑布走廊</span><i>→</i><span>🌈 終點大瀑布</span></div><div class="shot">📸 <b>值得拍</b>：<b>上段無名瀑布</b>——遊客到不了的地方，反而最原始 · <b>Skógafoss 頂端木階梯</b>俯瞰（下山時會先從上方經過，別急著下去）· 瀑布正面水霧中的彩虹，上午光線最好</div></div></details><div class="tags"><span class="tag t-bus">🚌 #52 Skógar→Skaftafell</span><span class="tag t-camp">🏕 <a href="https://maps.google.com/?q=Skaftafell+Campsite+Iceland" target="_blank">Skaftafell 露營地</a>（含淋浴、洗衣）</span></div><div class="photo-row" data-day="0827" data-tint="background:linear-gradient(145deg,#102a45,#1d5580)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/28</span><span class="di-w">五</span></div><span class="di-icon">🧊</span><span class="di-title">Skaftafell 冰河健行→返雷克雅維克</span><span class="di-acc">Bus Hostel</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">踏上 <b>Vatnajökull（瓦特納冰川）</b>，配冰爪、冰斧探索藍冰世界。09:00–14:00。下午搭巴士回首都，取回 BOUNCE 寄放大行李。</p><div class="tags"><span class="tag t-bus">🚌 #52 Skaftafell→雷克雅維克 15:14</span><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Reykjavik+Bus+Hostel" target="_blank">Reykjavík Bus Hostel</a>（2晚）</span></div><div class="photo-row" data-day="0828" data-tint="background:linear-gradient(145deg,#102a45,#1d5580)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/29</span><span class="di-w">六</span></div><span class="di-icon">🏙️</span><span class="di-title">雷克雅維克再訪 · 整裝準備飛法羅</span><span class="di-acc">Bus Hostel</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc"><b>Laugardalslaug 戶外溫泉泳池</b>（冰島人日常）· 採買伴手禮。注意：明日手提限 <b>6 kg</b>！</p><div class="tags"><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Reykjavik+Bus+Hostel" target="_blank">Reykjavík Bus Hostel</a>（續住）</span></div><div class="warn">⚠️ 機場接送 07:00–07:30</div><div class="photo-row" data-day="0829" data-tint="background:linear-gradient(145deg,#102a45,#1d5580)"></div></div></details>
+</div></section>
+
+<div class="c-wave" style="background:var(--fa-bg)"><svg viewBox="0 0 1440 48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="display:block;width:100%;height:48px"><path d="M0,0 Q360,48 720,24 Q1080,0 1440,36 L1440,0 Z" fill="#f8f6f2"/></svg></div><section class="country-sec" id="fa" style="--cc:var(--fa);background:var(--fa-bg)"><div class="c-top-bar"></div><div class="wrap"><div class="c-header"><span class="c-flag">🇫🇴</span><div><div class="c-name" style="color:var(--fa)">法羅群島 Faroe Islands · Føroyar</div><div class="c-en">NORTH ATLANTIC · 18 ISLANDS · SEA CLIFFS</div><span class="c-period">8月 30日 — 9月 6日 · 8天</span></div></div><div class="c-cards"><div class="cc"><div class="cc-lb">⏰ 時差 <span class="cc-dim">WEST / UTC+1</span></div><div class="cc-tz"><div class="tz-row"><span class="tz-flag">🇹🇼</span><span class="tz-time">台灣 14:00 → 當地 07:00</span></div><div class="tz-row"><span class="tz-flag">📍</span><span class="tz-time">台灣 23:00 → 當地 16:00</span></div></div></div><div class="cc"><div class="cc-lb">🌡️ 氣溫</div><div class="cc-val">12–17°C</div><div class="cc-sub">多霧多雨，天氣善變<br>每天帶雨衣</div></div><div class="cc"><div class="cc-lb">💴 貨幣</div><div class="cc-val">丹麥克朗 DKK</div><div class="cc-sub">1 DKK ≈ 4.6 TWD</div></div><div class="cc cc-warn"><div class="cc-lb">⚠️ 關鍵提醒</div><div class="cc-warn-body">到機場後立即購買 <b>SIM 卡</b>（Faroese Telecom / Vodafone）<br>7日巴士票 <b>DKK 700</b>（現場購）<br>Mykines 渡輪天氣差會取消，備 Plan B</div></div></div><details style="--cc:var(--fa)"><summary>📚 法羅群島深度介紹 <span class="chev">›</span></summary><div class="det-in">
+<details class="sub"><summary>🏝 關於法羅群島 <span class="chev">›</span></summary><div class="det-in">
+<p class="kp">18個島嶼，17個有人居住，人口僅 54,000。丹麥自治領地。<b>Enniberg 懸崖</b>是歐洲最高垂直海蝕崖（754m）。草皮屋頂（turf roof）是維京工法延續。<br>🐦 <b>角嘴海鸚（Puffin）</b>5–8月在 Mykines 大量繁殖。<br>🍖 必吃：Ræst 發酵羊肉 · 新鮮龍蝦</p>
+</div></details>
+<details class="sub"><summary>🗺 各島嶼介紹與地圖 <span class="chev">›</span></summary><div class="det-in">
+<div class="map-box"><div class="lmap" id="lmap-faroe"></div></div>
+<p class="kp"><b>Streymoy</b>：首都 Tórshavn。<b>Vágar</b>：機場 + Sørvágsvatn 海上懸湖。<b>Mykines</b>：角嘴海鸚聖地。<b>Kalsoy</b>：007島 Kallur 燈塔。<b>Eysturoy</b>：Gjógv 峽谷村 + Funningur 古教堂。</p>
+</div></details>
+<details class="sub"><summary>🗣 法羅文地名發音 <span class="chev">›</span></summary><div class="det-in">
+<div class="pron-grid">
+<div class="pc"><div class="p-en">Tórshavn</div><div class="p-zh">托爾斯港（首都）</div><div class="p-ipa">/ TOR-shawn /</div></div>
+<div class="pc"><div class="p-en">Vágar</div><div class="p-zh">瓦加爾（機場島）</div><div class="p-ipa">/ VAH-gar /</div></div>
+<div class="pc"><div class="p-en">Sørvágsvatn</div><div class="p-zh">索爾瓦斯瓦特恩（懸湖）</div><div class="p-ipa">/ SER-vogs-vatn /</div></div>
+<div class="pc"><div class="p-en">Mykines</div><div class="p-zh">密基內斯（海鸚島）</div><div class="p-ipa">/ MEE-ki-nes /</div></div>
+<div class="pc"><div class="p-en">Klaksvík</div><div class="p-zh">克拉克斯維克</div><div class="p-ipa">/ KLAK-svik /</div></div>
+<div class="pc"><div class="p-en">Kalsoy</div><div class="p-zh">卡爾索伊（007島）</div><div class="p-ipa">/ KAL-soy /</div></div>
+<div class="pc"><div class="p-en">Tjørnuvík</div><div class="p-zh">喬爾努維克（最北村）</div><div class="p-ipa">/ CHERN-u-vik /</div></div>
+<div class="pc"><div class="p-en">Gjógv</div><div class="p-zh">約格夫（峽谷村）</div><div class="p-ipa">/ GYEV /</div></div>
+</div>
+<p class="kp" style="font-size:13px;margin-top:8px">💡 <b>ø</b>唸/ö/；<b>gj</b>唸/y/；<b>á</b>唸/ow/。</p>
+</div></details>
+</div></details>
+<details style="--cc:var(--fa)"><summary>📋 實用資訊 <span class="chev">›</span></summary><div class="det-in"><div class="info-grid">
+<div class="ic"><div class="ic-lb">🚨 緊急</div><div class="ic-bd"><b style="font-size:18px">112</b></div></div>
+<div class="ic"><div class="ic-lb">🚌 巴士票</div><div class="ic-bd">7日無限次：<b>DKK 700</b>（機場現場購）<br>加2張單程：DKK 180/張</div></div>
+<div class="ic"><div class="ic-lb">⛴ 渡輪</div><div class="ic-bd"><a href="https://www.ssl.fo" target="_blank">ssl.fo</a><br>Mykines 需提前訂，天氣差取消</div></div>
+<div class="ic"><div class="ic-lb">📱 SIM卡</div><div class="ic-bd">機場購買 <b>Faroese Telecom</b><br>或 <b>Vodafone Faroe Islands</b><br>（落地立即辦）</div></div>
+</div></div></details>
+<div class="day-label">每日行程</div><details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/30</span><span class="di-w">日</span></div><span class="di-icon">✈️</span><span class="di-title">雷克雅維克→Tórshavn托爾斯港抵達</span><span class="di-acc">Tórshavn Airbnb</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">飛往法羅群島！<b>手提行李僅限 6 kg</b>（FI300 法羅航線），務必遵守。落地後立即購買 SIM 卡，再搭巴士進首都 Tórshavn。</p><div class="tags"><span class="tag t-fly">✈️ FI300 KEF→FAE 10:35/13:25（手提限6kg！）</span><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Torshavn+Faroe+Islands" target="_blank">Tórshavn Airbnb</a>（8晚）</span></div><div class="photo-row" data-day="0830" data-tint="background:linear-gradient(145deg,#0a2a34,#0d6070)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">8/31</span><span class="di-w">一</span></div><span class="di-icon">🚶</span><span class="di-title">Streymoy 本島中央山區健行</span><span class="di-acc">Tórshavn Airbnb</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">適應環境，踏查 Streymoy 中央山區，感受法羅特有的玄武岩岩壁與大西洋壯景。</p><details class="rt"><summary>🥾 今日路線 · Streymoy 中央山區 · 依體力可調<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Tórshavn</b> <span class="zh">托爾斯港</span><span class="mt">從市區搭巴士往內陸</span></li><li><b>Kirkjubøur</b> <span class="zh">基爾丘伯爾</span><span class="mt">法羅最重要的歷史遺址 · 12 世紀 Magnus 大教堂遺構＋全世界最古老的木造民宅之一（住了 17 代人）</span></li><li><b>Sornfelli</b> <span class="zh">索恩費利</span><span class="mt">749m · 舊北約雷達站的產業道路可直上，天氣好時全島展望</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>🏘️ 草皮屋頂村落</span><i>→</i><span>⛪ 中世紀遺址</span><i>→</i><span>🌾 開闊草坡</span><i>→</i><span>🌫️ 高處霧氣</span></div><div class="shot">📸 <b>值得拍</b>：<b>Kirkjubøur 海邊</b>——黑色木屋、草皮屋頂與 Hestur 島同框，法羅最經典的畫面 · 中世紀教堂遺構的<b>石拱窗框海景</b></div></div></details><div class="tags"><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Torshavn+Faroe+Islands" target="_blank">Tórshavn Airbnb</a>（2/8 晚）</span></div><div class="photo-row" data-day="0831" data-tint="background:linear-gradient(145deg,#0a2a34,#0d6070)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/1</span><span class="di-w">二</span></div><span class="di-icon">🌊</span><span class="di-title">Sørvágsvatn 海上懸湖 ＋ Mykines 角嘴海鸚</span><span class="di-acc">Tórshavn Airbnb</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc"><b>Sørvágsvatn</b>：視角造成的光學錯覺，湖水看似懸浮在海面上。<b>Mykines</b>：大量 Puffin 在崖邊繁殖，可近距離拍攝！</p><details class="rt"><summary>🥾 今日路線 · Sørvágsvatn 往返 7.4 km / 2h ＋ Mykines 全日<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Miðvágur</b> <span class="zh">米茲瓦格</span><span class="mt">懸湖步道起點 · 入口需付費並登記</span></li><li><b>Sørvágsvatn</b> <span class="zh">索爾瓦斯瓦特恩</span><span class="mt">法羅最大湖 · 沿東岸緩行，逐漸接近海崖</span></li><li><b>Trælanípa</b> <span class="zh">崔拉尼帕（奴隸崖）</span><span class="mt">142m 垂直海崖 · <b>視覺錯覺的關鍵位置</b>——從這裡看，湖面彷彿懸浮在大西洋上方</span></li><li><b>Bøsdalafossur</b> <span class="zh">博斯達拉瀑布</span><span class="mt">湖水直接墜入海中的瀑布，再走 15 分鐘可達</span></li><li><b>Mykines</b> <span class="zh">密基內斯</span><span class="mt">渡輪前往 · 沿崖徑走向燈塔，沿途都是角嘴海鸚巢穴</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>🌊 湖岸緩行</span><i>→</i><span>🧗 垂直海崖</span><i>→</i><span>💧 入海瀑布</span><i>→</i><span>🐦 海鸚棲地</span></div><div class="shot">📸 <b>值得拍</b>：<b>Trælanípa 崖邊南側</b>——這是懸湖錯覺唯一成立的角度，往南走到崖線轉折處效果最強 · <b>Mykines 燈塔步道</b>的海鸚特寫（牠們不太怕人，蹲低慢慢靠近）· 傍晚斜射光下的草皮屋頂村落</div></div></details><div class="tags"><span class="tag t-bus">🚌 Tórshavn→Vágar</span><span class="tag t-boat">⛴ 渡輪 Sørvágur↔Mykines</span></div><div class="warn">⚠️ Sørvágsvatn 需提前訂導覽票</div><div class="warn">⚠️ Sørvágsvatn 需提前訂導覽票<span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Torshavn+Faroe+Islands" target="_blank">Tórshavn Airbnb</a>（3/8 晚）</span></div><div class="photo-row" data-day="0901" data-tint="background:linear-gradient(145deg,#0a2a34,#0d6070)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/2</span><span class="di-w">三</span></div><span class="di-icon">⛰️</span><span class="di-title">Klakkur健行 ＋ Kalsoy 007燈塔</span><span class="di-acc">Tórshavn Airbnb</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc"><b>Klakkur（413m）</b>：Klaksvík最高點，俯瞰東法羅島群。<b>Kalsoy</b>：Kallur 燈塔以海角絕壁著稱。</p><details class="rt"><summary>🥾 今日路線 · Klakkur 往返 4 km / 1.5–2h ＋ Kalsoy 渡輪<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Klaksvík</b> <span class="zh">克拉克斯維克</span><span class="mt">法羅第二大城 · 從港邊沿產業道路起登</span></li><li><b>Klakkur</b> <span class="zh">克拉庫爾</span><span class="mt">413m · 三面環海的鋸齒稜線，可俯瞰整個北方島群</span></li><li><b>Syðradalur</b> <span class="zh">敘德拉達魯爾</span><span class="mt">搭渡輪抵達 Kalsoy，轉小巴穿過隧道北上</span></li><li><b>Trøllanes</b> <span class="zh">特羅德拉內斯</span><span class="mt">島最北端村落 · 燈塔步道起點</span></li><li><b>Kallur Lighthouse</b> <span class="zh">卡盧爾燈塔</span><span class="mt">綠色草脊延伸入海，兩側斷崖 · 007《生死交戰》取景地</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>⛰️ 制高展望</span><i>→</i><span>⛴️ 峽灣渡輪</span><i>→</i><span>🛣️ 單線隧道</span><i>→</i><span>🗼 海角燈塔</span></div><div class="shot">📸 <b>值得拍</b>：<b>Klakkur 山頂</b>——Klaksvík 雙峽灣港灣的鳥瞰 · <b>Kallur 燈塔背後的草脊</b>是法羅最著名的一張照片，站在燈塔北側往回拍，人站在稜線上當比例尺 · 注意風勢，稜線非常窄</div></div></details><div class="tags"><span class="tag t-boat">⛴ 渡輪 Klaksvík↔Kalsoy</span><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Torshavn+Faroe+Islands" target="_blank">Tórshavn Airbnb</a>（4/8 晚）</span></div><div class="photo-row" data-day="0902" data-tint="background:linear-gradient(145deg,#0a2a34,#0d6070)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/3</span><span class="di-w">四</span></div><span class="di-icon">⛰️</span><span class="di-title">Tjørnuvík 最北端 ＋ 刀鋒山脊</span><span class="di-acc">Tórshavn Airbnb</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc"><b>Tjørnuvík</b>：最北端古漁村，黑沙灘，「巨人與女巫」海蝕柱（Risin og Kellingin）。<b>刀鋒山脊（Blade Ridge）</b>走在刀刃般窄脊，兩側萬丈深淵。</p><details class="rt"><summary>🥾 今日路線 · Tjørnuvík 村＋刀鋒山脊 6 km / 2.5h<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Tjørnuvík</b> <span class="zh">喬爾努維克</span><span class="mt">Streymoy 最北端村落 · 黑沙灘與環抱的山壁</span></li><li><b>Risin og Kellingin</b> <span class="zh">巨人與女巫</span><span class="mt">海中兩座玄武岩柱 · 傳說是想拖走法羅群島的冰島巨人與女巫，天亮化為石</span></li><li><b>Villingadalsfjall 稜線</b> <span class="zh">刀鋒山脊</span><span class="mt">狹窄草脊，兩側直落數百米，海景 360°</span></li><li><b>Saksun</b> <span class="zh">薩克孫</span><span class="mt">回程順路 · 潟湖環抱的草皮屋頂農莊，法羅最上鏡的村落之一</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>🏖️ 黑沙灘</span><i>→</i><span>🗿 海蝕柱</span><i>→</i><span>🔪 刀刃窄脊</span><i>→</i><span>💚 潟湖農莊</span></div><div class="shot">📸 <b>值得拍</b>：<b>Tjørnuvík 沙灘</b>——用黑沙灘當前景拍兩座海蝕柱，退潮時最好 · <b>刀鋒山脊</b>回望村落與海灣（風大時務必蹲低）· <b>Saksun</b> 潟湖退潮後的鏡面反射</div></div></details><div class="tags"><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Torshavn+Faroe+Islands" target="_blank">Tórshavn Airbnb</a>（5/8 晚）</span></div><div class="photo-row" data-day="0903" data-tint="background:linear-gradient(145deg,#0a2a34,#0d6070)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/4</span><span class="di-w">五</span></div><span class="di-icon">🌿</span><span class="di-title">Eysturoy · Funningur古教堂 ＋ Gjógv 峽谷村</span><span class="di-acc">Tórshavn Airbnb</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc"><b>Funningur</b>：石砌古教堂（1847年）。<b>Gjógv</b>：National Geographic 評為世界最美小村，天然海溝，彩色划艇屋。</p><details class="rt"><summary>🥾 今日路線 · Eysturoy 北部 · 多點串連<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Funningur</b> <span class="zh">芬寧烏爾</span><span class="mt">1847 年石砌草皮頂教堂 · 傳說是第一批維京移民登陸地</span></li><li><b>Slættaratindur</b> <span class="zh">斯萊塔拉廷杜爾</span><span class="mt">880m 法羅最高峰 · 從隘口起登往返約 2–3h（視天氣決定）</span></li><li><b>Gjógv</b> <span class="zh">約格夫</span><span class="mt">以 200m 天然海溝命名的村落 · 溝內曾是天然船塢</span></li><li><b>Ambadalur</b> <span class="zh">安巴達魯爾</span><span class="mt">Gjógv 北側草坡 · 可眺望 Búgvin 海蝕柱</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>⛪ 古教堂</span><i>→</i><span>🏔️ 最高峰</span><i>→</i><span>🕳️ 天然海溝</span><i>→</i><span>🌊 海蝕柱</span></div><div class="shot">📸 <b>值得拍</b>：<b>Funningur 教堂</b>——尖峰當背景，草皮屋頂的紋理值得靠近拍 · <b>Gjógv 海溝</b>從村落側邊小徑往下俯瞰，溝壁與海水的層次 · <b>Ambadalur 草坡</b>是全法羅最壯闊的無人海崖景觀</div></div></details><div class="tags"><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Torshavn+Faroe+Islands" target="_blank">Tórshavn Airbnb</a>（6/8 晚）</span></div><div class="photo-row" data-day="0904" data-tint="background:linear-gradient(145deg,#0a2a34,#0d6070)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/5</span><span class="di-w">六</span></div><span class="di-icon">🏛️</span><span class="di-title">Tórshavn 市區深度漫遊</span><span class="di-acc">Tórshavn Airbnb</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc"><b>Tinganes 舊城區</b>：紅色木造老建築、草皮屋頂。購買法羅手工編織羊毛製品 · 品嚐 Ræst 發酵羊肉。</p><div class="tags"><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Torshavn+Faroe+Islands" target="_blank">Tórshavn Airbnb</a>（7/8 晚）</span></div><div class="photo-row" data-day="0905" data-tint="background:linear-gradient(145deg,#0a2a34,#0d6070)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/6</span><span class="di-w">日</span></div><span class="di-icon">🌅</span><span class="di-title">法羅最後一天 · 整裝道別</span><span class="di-acc">Tórshavn Airbnb</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">重訪最喜歡的角落，港邊餐廳享用法羅海鮮晚餐，向北大西洋秘境道別。</p><div class="tags"><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Torshavn+Faroe+Islands" target="_blank">Tórshavn Airbnb</a>（最後一晚）</span></div><div class="warn">⚠️ 明日 FAE→EDI 15:00，請早到機場</div><div class="photo-row" data-day="0906" data-tint="background:linear-gradient(145deg,#0a2a34,#0d6070)"></div></div></details>
+</div></section>
+
+<div class="c-wave" style="background:var(--ed-bg)"><svg viewBox="0 0 1440 48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="display:block;width:100%;height:48px"><path d="M0,0 Q360,48 720,24 Q1080,0 1440,36 L1440,0 Z" fill="#f8f6f2"/></svg></div><section class="country-sec" id="ed" style="--cc:var(--ed);background:var(--ed-bg)"><div class="c-top-bar"></div><div class="wrap"><div class="c-header"><span class="c-flag">🏴󠁧󠁢󠁳󠁣󠁴󠁿</span><div><div class="c-name" style="color:var(--ed)">愛丁堡 Edinburgh</div><div class="c-en">MEDIEVAL CAPITAL · UNESCO WORLD HERITAGE</div><span class="c-period">9月 7日 — 9月 9日 · 3天</span></div></div><div class="c-cards"><div class="cc"><div class="cc-lb">⏰ 時差 <span class="cc-dim">BST / UTC+1</span></div><div class="cc-tz"><div class="tz-row"><span class="tz-flag">🇹🇼</span><span class="tz-time">台灣 14:00 → 當地 07:00</span></div><div class="tz-row"><span class="tz-flag">📍</span><span class="tz-time">台灣 23:00 → 當地 16:00</span></div></div></div><div class="cc"><div class="cc-lb">🌡️ 氣溫</div><div class="cc-val">13–18°C</div><div class="cc-sub">九月涼爽，偶有陣雨</div></div><div class="cc"><div class="cc-lb">💷 貨幣</div><div class="cc-val">英鎊 GBP</div><div class="cc-sub">1 GBP ≈ 42 TWD</div></div><div class="cc cc-warn"><div class="cc-lb">⚠️ 關鍵提醒</div><div class="cc-warn-body">Ryanair 隨身行李限 <b>40×30×20 cm</b><br>入住前確認青旅／Airbnb 地址<br>愛丁堡節人潮多，提早訂位</div></div></div><details style="--cc:var(--ed)"><summary>📚 愛丁堡歷史文化 <span class="chev">›</span></summary><div class="det-in">
+<p class="kp">建於休眠火山岩丘，超過 2,000 年歷史。<b>Old Town 舊城</b>+<b>New Town 新城</b>共同列入 UNESCO 世遺（1995）。<b>Edinburgh Castle</b> 收藏蘇格蘭皇冠珠寶 &amp; 命運之石。<br>🥃 必吃：Haggis 雜碎布丁 · Cullen skink 鹹鱈魚濃湯 · 單一麥芽威士忌<br>🗣 乾杯：<b>Slàinte Mhath</b>（/ SLAN-cha va /）</p>
+</div></details>
+<details style="--cc:var(--ed)"><summary>📋 實用資訊 <span class="chev">›</span></summary><div class="det-in"><div class="info-grid">
+<div class="ic"><div class="ic-lb">🚨 緊急</div><div class="ic-bd"><b style="font-size:18px">999 / 112</b></div></div>
+<div class="ic"><div class="ic-lb">🚌 機場↔市區</div><div class="ic-bd">Airlink 100 £5.50<br>Tram £7.60 · 約 30–40 分</div></div>
+</div></div></details>
+<div class="day-label">每日行程</div><details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/7</span><span class="di-w">一</span></div><span class="di-icon">✈️</span><span class="di-title">法羅群島→愛丁堡抵達</span><span class="di-acc">愛丁堡青旅</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">飛越北大西洋，飛抵蘇格蘭古都。入境後沿 Royal Mile 散步感受千年城市氛圍。</p><div class="tags"><span class="tag t-fly">✈️ RC414 FAE→EDI 15:00/16:25（座位 01A）</span><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Edinburgh+Youth+Hostel" target="_blank">愛丁堡青旅</a></span></div><div class="photo-row" data-day="0907" data-tint="background:linear-gradient(145deg,#2a1a0c,#63381d)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/8</span><span class="di-w">二</span></div><span class="di-icon">🏰</span><span class="di-title">城堡·Royal Mile·Victoria Street·Grassmarket</span><span class="di-acc">愛丁堡 Airbnb</span><span class="di-chev">›</span></div></summary><div class="di-body"><ul class="di-desc"><li><b>Edinburgh Castle</b>：皇冠珠寶 &amp; 命運之石</li><li><b>Victoria Street</b>：彎曲彩色建築，哈利波特斜角巷靈感</li><li><b>Grassmarket</b>：酒吧廣場，必吃正統 Haggis</li></ul><div class="tags"><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Edinburgh+Old+Town+Airbnb" target="_blank">Edinburgh Airbnb</a>（2晚）</span></div><div class="photo-row" data-day="0908" data-tint="background:linear-gradient(145deg,#2a1a0c,#63381d)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/9</span><span class="di-w">三</span></div><span class="di-icon">⛰️</span><span class="di-title">亞瑟王座·博物館·威士忌體驗</span><span class="di-acc">愛丁堡 Airbnb</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc"><b>Arthur's Seat（251m）</b>：死火山，往返約 2h，全城 360° 景觀。<b>蘇格蘭國家博物館</b>免費入場。<b>Scotch Whisky Experience</b> 互動導覽。</p><div class="tags"><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Edinburgh+Old+Town+Airbnb" target="_blank">Edinburgh Airbnb</a>（續住）</span></div><div class="warn">⚠️ 明日 15:00 飛都柏林，FR815 隨身限 40×30×20 cm</div><div class="photo-row" data-day="0909" data-tint="background:linear-gradient(145deg,#2a1a0c,#63381d)"></div></div></details>
+</div></section>
+
+<div class="c-wave" style="background:var(--ir-bg)"><svg viewBox="0 0 1440 48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="display:block;width:100%;height:48px"><path d="M0,0 Q360,48 720,24 Q1080,0 1440,36 L1440,0 Z" fill="#f8f6f2"/></svg></div><section class="country-sec" id="ir" style="--cc:var(--ir);background:var(--ir-bg)"><div class="c-top-bar"></div><div class="wrap"><div class="c-header"><span class="c-flag">🇮🇪</span><div><div class="c-name" style="color:var(--ir)">愛爾蘭·都柏林 Dublin</div><div class="c-en">BAILE ÁTHA CLIATH · BOOK OF KELLS · PUB CULTURE</div><span class="c-period">9月 10日 — 9月 12日 · 3天</span></div></div><div class="c-cards"><div class="cc"><div class="cc-lb">⏰ 時差 <span class="cc-dim">IST / UTC+1</span></div><div class="cc-tz"><div class="tz-row"><span class="tz-flag">🇹🇼</span><span class="tz-time">台灣 14:00 → 當地 07:00</span></div><div class="tz-row"><span class="tz-flag">📍</span><span class="tz-time">台灣 23:00 → 當地 16:00</span></div></div></div><div class="cc"><div class="cc-lb">🌡️ 氣溫</div><div class="cc-val">13–18°C</div><div class="cc-sub">九月涼爽，偶有陣雨</div></div><div class="cc"><div class="cc-lb">💴 貨幣</div><div class="cc-val">歐元 EUR</div><div class="cc-sub">1 EUR ≈ 36 TWD</div></div><div class="cc cc-warn"><div class="cc-lb">⚠️ 關鍵提醒</div><div class="cc-warn-body">9/13 晚 <b>20:15</b> 飛威尼斯<br>FR831 隨身限 40×30×20 cm<br>Ryanair 提前 2h 到機場</div></div></div><details style="--cc:var(--ir)"><summary>📚 都柏林文化介紹 <span class="chev">›</span></summary><div class="det-in">
+<p class="kp">都柏林（<b>Baile Átha Cliath</b>）建於維京時代（9世紀），1922 年愛爾蘭共和國獨立後成為首都。<b>Book of Kells（凱爾斯之書）</b>西元 800 年手抄福音書，是西方最精美的中世紀手抄本。<b>Guinness</b> 由 Arthur Guinness 1759 年創立。<br>🗣 乾杯：<b>Sláinte</b>（/ SLAWN-cha /）</p>
+</div></details>
+<details style="--cc:var(--ir)"><summary>📋 實用資訊 <span class="chev">›</span></summary><div class="det-in"><div class="info-grid">
+<div class="ic"><div class="ic-lb">🚨 緊急</div><div class="ic-bd"><b style="font-size:18px">999 / 112</b></div></div>
+<div class="ic"><div class="ic-lb">📱 App</div><div class="ic-bd"><span class="atag">TFI Live</span><span class="atag">Dublin Bus</span><span class="atag">Leap Card</span></div></div>
+<div class="ic"><div class="ic-lb">🚌 機場↔市區</div><div class="ic-bd">Aircoach 700 · Airlink 747<br>約 30–45 分，EUR 8–10</div></div>
+</div></div></details>
+<div class="day-label">每日行程</div><details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/10</span><span class="di-w">四</span></div><span class="di-icon">✈️</span><span class="di-title">愛丁堡→都柏林·與友人會合</span><span class="di-acc">大大家</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">飛往愛爾蘭首都，與友人（大大）會合。⚠️ Ryanair 隨身：<b>40×30×20 cm 以內</b>。</p><div class="tags"><span class="tag t-fly">✈️ FR815 EDI→DUB 15:00/16:05</span><span class="tag t-acc">🏠 大大家（私人住宿，3晚） · 私人住址</span></div><div class="photo-row" data-day="0910" data-tint="background:linear-gradient(145deg,#0b2612,#1d5730)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/11</span><span class="di-w">五</span></div><span class="di-icon">🍺</span><span class="di-title">都柏林·文學×黑啤×歷史</span><span class="di-acc">大大家</span><span class="di-chev">›</span></div></summary><div class="di-body"><ul class="di-desc"><li><b>Trinity College</b>：愛爾蘭最古老大學（1592年），收藏 <b>Book of Kells</b></li><li><b>Guinness Storehouse</b>：7層博物館，頂層俯瞰全城</li><li><b>Temple Bar</b>：每晚愛爾蘭傳統音樂現場演奏</li></ul><div class="tags"><span class="tag t-acc">🏠 大大家（續住） · 私人住址</span></div><div class="photo-row" data-day="0911" data-tint="background:linear-gradient(145deg,#0b2612,#1d5730)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/12</span><span class="di-w">六</span></div><span class="di-icon">🍀</span><span class="di-title">都柏林悠閒探索</span><span class="di-acc">大大家</span><span class="di-chev">›</span></div></summary><div class="di-body"><ul class="di-desc"><li><b>Grafton Street</b>：步行街，街頭音樂人</li><li><b>St. Stephen's Green</b>：市中心綠洲公園</li></ul><div class="tags"><span class="tag t-acc">🏠 大大家（最後一晚） · 私人住址</span></div><div class="warn">⚠️ 明日 9/13 晚 20:15 飛威尼斯，提前整理好行李</div><div class="photo-row" data-day="0912" data-tint="background:linear-gradient(145deg,#0b2612,#1d5730)"></div></div></details>
+</div></section>
+
+<div class="c-wave" style="background:var(--it-bg)"><svg viewBox="0 0 1440 48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="display:block;width:100%;height:48px"><path d="M0,0 Q360,48 720,24 Q1080,0 1440,36 L1440,0 Z" fill="#f8f6f2"/></svg></div>
+<section class="country-sec" id="it" style="--cc:var(--it);background:var(--it-bg)">
+<div class="c-top-bar"></div><div class="wrap">
+<div class="c-header"><span class="c-flag">🇮🇹</span>
+<div><div class="c-name" style="color:var(--it)">義大利 · 多洛米提 Dolomiti</div>
+<div class="c-en">VENEZIA · DOLOMITI · SOUTH TYROL · MILANO</div>
+<span class="c-period">9月 13日 — 9月 25日 · 13天</span></div></div>
+<div class="c-cards">
+  <div class="cc"><div class="cc-lb">⏰ 時差 <span class="cc-dim">CEST / UTC+2</span></div><div class="cc-tz"><div class="tz-row"><span class="tz-flag">🇹🇼</span><span class="tz-time">台灣 13:00 → 當地 07:00</span></div><div class="tz-row"><span class="tz-flag">📍</span><span class="tz-time">台灣 23:00 → 當地 17:00</span></div></div></div>
+  <div class="cc"><div class="cc-lb">🌡️ 氣溫</div><div class="cc-val">山區 10–18°C</div><div class="cc-sub">威尼斯 22–27°C<br>日夜溫差大，備保暖層</div></div>
+  <div class="cc"><div class="cc-lb">💴 貨幣</div><div class="cc-val">歐元 EUR</div><div class="cc-sub">1 EUR ≈ 36–38 TWD</div></div>
+  <div class="cc cc-warn"><div class="cc-lb">⚠️ 關鍵提醒</div><div class="cc-warn-body">山屋只收<b>現金</b>（多備 EUR 現金）<br>Tre Cime 停車費 + 收費道路<br>Cortina Express 14:20 勿遲到</div></div>
+</div><details style="--cc:var(--it)"><summary>📚 多洛米提深度介紹 <span class="chev">›</span></summary><div class="det-in">
+<details class="sub"><summary>⛰ 地質與文化 <span class="chev">›</span></summary><div class="det-in">
+<p class="kp"><b>多洛米提（Dolomiti）</b>2009年 UNESCO 世界自然遺產。2.3億年前為熱帶珊瑚礁，受板塊抬升。<b>Enrosadira</b>：日出日落時岩石染橘紅玫瑰色。<b>南提羅爾</b>義大利語、德語、拉丁語三語並用。<br>🍲 必吃：Speck 燻火腿 · Schlutzkrapfen 菠菜起司餃 · Knödel 麵包丸子 · Strudel 蘋果捲</p>
+</div></details>
+<details class="sub"><summary>🧗 Via Ferrata 鐵道攀岩說明 <span class="chev">›</span></summary><div class="det-in">
+<p class="kp"><b>Via Ferrata</b>（義大利文「鐵路」）利用固定在岩壁的鐵梯、鐵棒、鋼纜攀登，起源於一戰義大利軍隊。裝備（通常由行程提供）：<b>安全帶 · 頭盔 · Y型緩衝連結繩</b>。難度1（初級）~6（高難度），此行預計 2–3 級。</p>
+</div></details>
+<details class="sub"><summary>🗺 纜車系統地圖 <span class="chev">›</span></summary><div class="det-in">
+<div class="map-box"><div class="lmap" id="lmap-dolomites"></div></div>
+</div></details>
+<details class="sub"><summary>🗣 地名發音指南（義大利文 + 德文） <span class="chev">›</span></summary><div class="det-in">
+<div class="pron-grid">
+<div class="pc"><div class="p-en">Venezia / Venice</div><div class="p-zh">威尼斯</div><div class="p-ipa">/ ve-NET-sia /</div></div>
+<div class="pc"><div class="p-en">Dobbiaco / Toblach</div><div class="p-zh">多比亞科</div><div class="p-ipa">/ DOB-ya-ko /</div></div>
+<div class="pc"><div class="p-en">Tre Cime di Lavaredo</div><div class="p-zh">三峰山</div><div class="p-ipa">/ TREH CHEE-meh dee la-va-REH-do /</div></div>
+<div class="pc"><div class="p-en">Cortina d'Ampezzo</div><div class="p-zh">科爾蒂納達姆佩佐</div><div class="p-ipa">/ kor-TEE-na dam-PET-so /</div></div>
+<div class="pc"><div class="p-en">Lago di Braies</div><div class="p-zh">布萊耶斯湖（珍珠湖）</div><div class="p-ipa">/ LAH-go dee BRA-yes /</div></div>
+<div class="pc"><div class="p-en">Ortisei / St. Ulrich</div><div class="p-zh">奧爾蒂塞</div><div class="p-ipa">/ or-ti-ZAY /</div></div>
+<div class="pc"><div class="p-en">Seceda</div><div class="p-zh">賽切達（最美山脊）</div><div class="p-ipa">/ se-CHEH-da /</div></div>
+<div class="pc"><div class="p-en">Alpe di Siusi / Seiser Alm</div><div class="p-zh">修斯高原（最大牧場）</div><div class="p-ipa">/ AL-peh dee SYOO-zee /</div></div>
+<div class="pc"><div class="p-en">Sassolungo / Langkofel</div><div class="p-zh">薩索倫戈（長石峰）</div><div class="p-ipa">/ SAS-so-LONG-go /</div></div>
+<div class="pc"><div class="p-en">Val Gardena / Gröden</div><div class="p-zh">瓦爾加德納谷</div><div class="p-ipa">/ val gar-DEH-na /</div></div>
+<div class="pc"><div class="p-en">Bolzano / Bozen</div><div class="p-zh">波札諾</div><div class="p-ipa">/ bol-TSA-no /</div></div>
+<div class="pc"><div class="p-en">Via Ferrata / Rifugio</div><div class="p-zh">鐵道攀岩 / 山屋</div><div class="p-ipa">/ VEE-a fer-RAH-ta / ri-FOO-jo /</div></div>
+</div>
+<p class="kp" style="font-size:13px;margin-top:8px">💡 義大利語 <b>c</b> 在 i/e 前唸 /ch/；<b>gn</b> 唸 /ny/（Gnocchi→你歐基）。</p>
+</div></details>
+</div></details>
+<details style="--cc:var(--it)"><summary>📋 實用資訊 <span class="chev">›</span></summary><div class="det-in"><div class="info-grid">
+<div class="ic"><div class="ic-lb">🚨 緊急電話</div><div class="ic-bd"><b style="font-size:18px">112</b> 通用 · 醫療 <b>118</b></div></div>
+<div class="ic"><div class="ic-lb">📱 App</div><div class="ic-bd"><span class="atag">Trenitalia</span><span class="atag">Omio</span><span class="atag">SAD buses</span><span class="atag">Rifugi.info</span></div></div>
+<div class="ic"><div class="ic-lb">🚄 火車查詢</div><div class="ic-bd"><a href="https://www.trenitalia.com" target="_blank">trenitalia.com</a><br>Frecciarossa = 義大利高鐵</div></div>
+<div class="ic"><div class="ic-lb">⚠️ 山屋規則</div><div class="ic-bd">只收<b>現金</b> · 自備毛巾<br>Half-board 含早晚餐<br>晚餐時間固定（勿遲到）</div></div>
+</div></div></details>
+<div class="day-label">每日行程</div><details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/13</span><span class="di-w">日</span></div><span class="di-icon">✈️</span><span class="di-title">都柏林→威尼斯深夜抵達</span><span class="di-acc">威尼斯露營地</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">都柏林白天吃喝，傍晚飛義大利，深夜 23:55 抵達威尼斯機場（VCE）。</p><div class="tags"><span class="tag t-fly">✈️ FR831 DUB→VCE 20:15/23:55</span><span class="tag t-camp">🏕 <a href="https://maps.google.com/?q=Venice+Camping+Rialto+Village" target="_blank">Venice Camping Rialto Village</a></span></div><div class="photo-row" data-day="0913" data-tint="background:linear-gradient(145deg,#331708,#8a3a12)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/14</span><span class="di-w">一</span></div><span class="di-icon">⛵</span><span class="di-title">威尼斯 5h 觀光 → Dobbiaco 多洛米提</span><span class="di-acc">Dobbiaco 青旅</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">行李寄放後進水都：<b>聖馬可廣場 · 嘆息橋 · 里亞托橋</b> · 貢多拉水道。13:00 取行李搭 Cortina Express 進多洛米提。</p><div class="tags"><span class="tag t-bus">🚌 Cortina Express VCE→Dobbiaco 14:20/17:38</span><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Dobbiaco+Youth+Hostel+Toblach" target="_blank">Dobbiaco Youth Hostel</a>（3晚，含早餐）</span></div><div class="photo-row" data-day="0914" data-tint="background:linear-gradient(145deg,#331708,#8a3a12)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/15</span><span class="di-w">二</span></div><span class="di-icon">🧗</span><span class="di-title">Via Ferrata 鐵道攀岩 · Cortina d'Ampezzo</span><span class="di-acc">Dobbiaco 青旅</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">在 <b>Cortina d'Ampezzo（科爾蒂納達姆佩佐）</b>進行 Via Ferrata，配安全帶、頭盔攀爬固定鐵梯鋼纜路線。Cortina 曾是 1956 年冬奧主辦地。</p><details class="rt"><summary>🥾 今日路線 · Via Ferrata 導覽全日<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Cortina d'Ampezzo</b> <span class="zh">科爾蒂納達姆佩佐</span><span class="mt">1956 冬奧主辦地 · 集合、領取裝備</span></li><li><b>裝備確認</b> <span class="zh">harness · helmet · Y 型連結繩</span><span class="mt">出發前導覽員會示範雙鉤交替扣掛的原則</span></li><li><b>鐵道路段</b> <span class="zh">Via Ferrata</span><span class="mt">沿一戰時期軍隊釘設的鐵梯鋼纜攀升，難度 2–3 級</span></li><li><b>稜線展望</b> <span class="zh">Tofane / Lagazuoi 一帶</span><span class="mt">白雲石峭壁與遠方 Marmolada 冰河</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>🏔️ 山城</span><i>→</i><span>🧗 垂直岩壁</span><i>→</i><span>⛓️ 鐵道路段</span><i>→</i><span>🌄 稜線展望</span></div><div class="shot">📸 <b>值得拍</b>：<b>攀爬中回望</b>——腳下的深度感是 Via Ferrata 才有的畫面（請導覽員幫忙拍，自己雙手要顧著扣環）· 岩壁上<b>一戰遺留的鐵件鏽色</b>特寫</div></div></details><div class="tags"><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Dobbiaco+Youth+Hostel+Toblach" target="_blank">Dobbiaco Youth Hostel</a>（續住）</span></div><div class="photo-row" data-day="0915" data-tint="background:linear-gradient(145deg,#331708,#8a3a12)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/16</span><span class="di-w">三</span></div><span class="di-icon">💎</span><span class="di-title">Lago di Braies 珍珠湖 · San Candido</span><span class="di-acc">Dobbiaco 青旅</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc"><b>Lago di Braies（布萊耶斯湖）</b>：翡翠色湖水倒映石灰岩峭壁，號稱「多洛米提的珍珠」，環湖 3.5km。<b>San Candido</b>：1143年羅馬式大學教堂。</p><details class="rt"><summary>🥾 今日路線 · 環湖 3.5 km / 1h（平緩）<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Lago di Braies</b> <span class="zh">布萊耶斯湖／Pragser Wildsee</span><span class="mt">1496m · 翡翠色來自冰河細粉懸浮</span></li><li><b>木造船屋</b> <span class="zh">Bootshaus</span><span class="mt">湖北端的紅頂船屋，多洛米提最知名的一個畫面</span></li><li><b>Croda del Becco</b> <span class="zh">貝科峰</span><span class="mt">2810m · 湖南端拔地而起的巨壁，湖面倒影的主角</span></li><li><b>San Candido</b> <span class="zh">聖甘迪多／Innichen</span><span class="mt">回程順路 · 1143 年羅馬式大學教堂</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>💎 冰河湖</span><i>→</i><span>🛶 木造船屋</span><i>→</i><span>🪨 垂直巨壁</span><i>→</i><span>⛪ 中世紀小鎮</span></div><div class="shot">📸 <b>值得拍</b>：<b>船屋前的木棧道</b>——經典中的經典，<b>日出前後最美且沒人</b>（9 點後遊客大量湧入）· 環湖到南端回望，Croda del Becco 完整倒映在湖面 · 租划艇從水面拍岸壁</div></div></details><div class="tags"><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Dobbiaco+Youth+Hostel+Toblach" target="_blank">Dobbiaco Youth Hostel</a>（最後一晚）</span></div><div class="warn">⚠️ 旺季限車，建議提早或搭接駁車</div><div class="photo-row" data-day="0916" data-tint="background:linear-gradient(145deg,#331708,#8a3a12)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/17</span><span class="di-w">四</span></div><span class="di-icon">🏔️</span><span class="di-title">Tre Cime di Lavaredo 環形健行→Locatelli山屋</span><span class="di-acc">Locatelli 山屋</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc"><b>三峰山（2,999m）</b>：多洛米提最具代表性的三根孤峰，環形約 10km / 3–5h。提早抵達 <b>Rifugio Locatelli（2,405m）</b>入住。</p><details class="rt"><summary>🥾 今日路線 · 三峰環線 10 km / 3–5h / +350m<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Rifugio Auronzo</b> <span class="zh">奧龍佐山屋</span><span class="mt">2320m · 收費山路終點，環線起點</span></li><li><b>Rifugio Lavaredo</b> <span class="zh">拉瓦雷多山屋</span><span class="mt">南壁下方 · 三峰的「正面」由此開始</span></li><li><b>Forcella Lavaredo</b> <span class="zh">拉瓦雷多隘口</span><span class="mt">2454m · <b>翻過隘口的瞬間北壁完整展開</b>，全程最戲劇性的一刻</span></li><li><b>Rifugio Locatelli</b> <span class="zh">洛卡泰利山屋</span><span class="mt">2405m · 今晚宿點 · 正對三峰北壁</span></li><li><b>環線後段</b> <span class="zh">西側繞行</span><span class="mt">人少、光線側逆，回望三峰的另一種輪廓</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>🚗 高山公路</span><i>→</i><span>🪨 南壁碎石</span><i>→</i><span>🚪 隘口轉折</span><i>→</i><span>🏔️ 北壁正面</span></div><div class="shot">📸 <b>值得拍</b>：<b>Forcella Lavaredo 隘口</b>——轉過去的第一眼，三根巨柱一字排開 · <b>Locatelli 山屋前</b>是拍三峰北壁的標準位置，<b>日落 Enrosadira</b> 時岩壁轉為橘紅（住山屋最大的好處就是這個）· 清晨無風時山屋旁小池的倒影</div></div></details><div class="tags"><span class="tag t-hut">🛖 <a href="https://maps.google.com/?q=Rifugio+Locatelli+Tre+Cime" target="_blank">Rifugio Locatelli</a>（含早晚餐）</span></div><div class="warn">⚠️ 晚餐 18:00–19:15 · 早餐 07:00 · <b>只收現金！</b></div><div class="photo-row" data-day="0917" data-tint="background:linear-gradient(145deg,#331708,#8a3a12)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/18</span><span class="di-w">五</span></div><span class="di-icon">🚌</span><span class="di-title">Locatelli→Dobbiaco→Ortisei 西多洛米提</span><span class="di-acc">Ortisei 民宿</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">下山取行李，轉移至西多洛米提核心小鎮 <b>Ortisei（奧爾蒂塞）</b>——<b>Val Gardena（瓦爾加德納）</b>谷地的傳統木雕工藝小鎮，接下來三天纜車健行的基地。</p><div class="tags"><span class="tag t-acc">🏨 <a href="https://maps.google.com/?q=Madonna+Guesthouse+Ortisei" target="_blank">Ortisei Madonna Guesthouse</a>（4晚，含早晚餐）</span></div><div class="photo-row" data-day="0918" data-tint="background:linear-gradient(145deg,#331708,#8a3a12)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/19</span><span class="di-w">六</span></div><span class="di-icon">🚡</span><span class="di-title">纜車 D1 · Rasciesa ＋ Alpe di Siusi</span><span class="di-acc">Ortisei 民宿</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc"><b>Rasciesa（2,175m）</b>俯瞰 Val Gardena 谷地。<b>Alpe di Siusi（Seiser Alm）</b>：歐洲最大高山牧場（56km²），秋天金黃草地配多洛米提尖峰。</p><details class="rt"><summary>🥾 今日路線 · Rasciesa 高原 ＋ Alpe di Siusi<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Ortisei</b> <span class="zh">奧爾蒂塞</span><span class="mt">搭 Rasciesa 纜車直上</span></li><li><b>Rasciesa</b> <span class="zh">拉西薩</span><span class="mt">2175m · 開闊草脊，俯瞰整條 Val Gardena 谷地</span></li><li><b>Alpe di Siusi</b> <span class="zh">修斯高原／Seiser Alm</span><span class="mt">56 km² · <b>歐洲最大高山牧場</b>，起伏草原上散落木造牧舍</span></li><li><b>Sassolungo 遠景</b> <span class="zh">長石峰</span><span class="mt">高原東側的天際線主角</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>🚡 纜車爬升</span><i>→</i><span>🌾 高山草脊</span><i>→</i><span>🏡 牧場木屋</span><i>→</i><span>🏔️ 尖峰天際線</span></div><div class="shot">📸 <b>值得拍</b>：<b>Alpe di Siusi 木造牧舍</b>——草原、小屋、後方尖峰三層構圖，九月草色轉金最美 · 高原上的<b>緩坡曲線</b>用長焦壓縮層次 · 清晨常有雲海淹沒谷地</div></div></details><div class="tags"><span class="tag t-acc">🏨 <a href="https://maps.google.com/?q=Madonna+Guesthouse+Ortisei" target="_blank">Ortisei Madonna Guesthouse</a>（含早晚餐 · 續住）</span></div><div class="photo-row" data-day="0919" data-tint="background:linear-gradient(145deg,#331708,#8a3a12)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/20</span><span class="di-w">日</span></div><span class="di-icon">🚡</span><span class="di-title">纜車 D2 · Sassolungo 薩索倫戈長石峰</span><span class="di-acc">Ortisei 民宿</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc"><b>Sassolungo（Langkofel，3,181m）</b>：垂直尖塔形孤峰，多洛米提最具戲劇性地形之一。繞峰路線欣賞多種角度。</p><div class="tags"><span class="tag t-acc">🏨 <a href="https://maps.google.com/?q=Madonna+Guesthouse+Ortisei" target="_blank">Ortisei Madonna Guesthouse</a>（含早晚餐 · 續住）</span></div><div class="photo-row" data-day="0920" data-tint="background:linear-gradient(145deg,#331708,#8a3a12)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/21</span><span class="di-w">一</span></div><span class="di-icon">🚡</span><span class="di-title">纜車 D3 · Seceda 最美山脊</span><span class="di-acc">Ortisei 民宿</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc"><b>Seceda（賽切達，2,519m）</b>：Val Gardena 最具代表性的山脊線，陡峭岩壁與翠綠草坡極度戲劇化對比。傍晚等 <b>Enrosadira</b> 玫瑰效應（岩石染橘紅色）。</p><details class="rt"><summary>🥾 今日路線 · Col Raiser → Seceda 稜線<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Ortisei</b> <span class="zh">奧爾蒂塞</span><span class="mt">搭纜車經 Furnes 上 Seceda，或由 Col Raiser 上</span></li><li><b>Seceda 稜線</b> <span class="zh">賽切達</span><span class="mt">2519m · <b>Odle/Geisler 群峰的鋸齒狀斜面</b>，一側翠綠草坡、一側垂直岩壁</span></li><li><b>Fermeda 隘口</b> <span class="zh">費爾梅達</span><span class="mt">可續走至更近岩壁的位置</span></li><li><b>Rifugio Firenze</b> <span class="zh">佛羅倫斯山屋</span><span class="mt">下山途中的休息點，供餐</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>🚡 纜車</span><i>→</i><span>🌿 草坡稜線</span><i>→</i><span>🪒 鋸齒岩壁</span><i>→</i><span>🌅 玫瑰效應</span></div><div class="shot">📸 <b>值得拍</b>：<b>Seceda 主稜線</b>——那個傾斜草坡與尖銳岩壁的對比，是多洛米提最被拍爛卻依然震撼的角度；人站在稜線邊當比例尺效果最好 · <b>傍晚 Enrosadira</b>：日落前 20 分鐘岩壁由白轉橘轉玫瑰紅，記得留時間等（末班纜車時間要先確認）</div></div></details><div class="tags"><span class="tag t-acc">🏨 <a href="https://maps.google.com/?q=Madonna+Guesthouse+Ortisei" target="_blank">Ortisei Madonna Guesthouse</a>（含早晚餐 · 最後一晚）</span></div><div class="photo-row" data-day="0921" data-tint="background:linear-gradient(145deg,#331708,#8a3a12)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/22</span><span class="di-w">二</span></div><span class="di-icon">⛰️</span><span class="di-title">Val di Fassa → Santnerpass 高山山口</span><span class="di-acc">Santnerpass 山屋</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">前往 <b>Val di Fassa（法薩山谷）</b>，健行至 <b>Rifugio Santner（桑特那山口，2,734m）</b>。健行約 3–5h，爬升 800–1,000m。</p><details class="rt"><summary>🥾 今日路線 · Vigo di Fassa → Santnerpass · 3–5h / +800–1000m<span class="chev">›</span></summary><div class="rt-in"><ol class="wp"><li><b>Vigo di Fassa</b> <span class="zh">維戈迪法薩</span><span class="mt">法薩谷小鎮 · 可搭 Ciampedie 纜車省下部分爬升</span></li><li><b>Gardeccia</b> <span class="zh">加爾德恰</span><span class="mt">山谷底部的山屋群 · 抬頭即 Catinaccio 巨壁</span></li><li><b>Vajolet 塔群</b> <span class="zh">瓦約萊特塔</span><span class="mt"><b>三根近乎垂直的岩塔</b>，多洛米提攀岩聖地</span></li><li><b>Passo Santner</b> <span class="zh">桑特那山口</span><span class="mt">2734m · 鑿在岩壁上的窄徑與階梯，部分路段有鋼纜</span></li><li><b>Rifugio Santner</b> <span class="zh">桑特那山屋</span><span class="mt">山口上的小屋 · 位置極為戲劇性</span></li></ol><div class="rt-h" style="margin:14px 0 6px">🌈 景觀變化</div><div class="arc"><span>🌲 谷地森林</span><i>→</i><span>🪨 巨壁仰望</span><i>→</i><span>🗼 岩塔群</span><i>→</i><span>⛓️ 岩壁窄徑</span></div><div class="shot">📸 <b>值得拍</b>：<b>Gardeccia 仰望 Vajolet 塔</b>——三塔並立的正面 · <b>山口窄徑</b>回望法薩谷，落差感強烈 · 山屋位置面西，<b>日落時整片 Catinaccio（意為玫瑰花園）名副其實地轉紅</b>——這座山的名字就是這麼來的</div></div></details><div class="tags"><span class="tag t-hut">🛖 <a href="https://maps.google.com/?q=Rifugio+Santner+Dolomites" target="_blank">Santnerpass Mountain Hut</a>（含早晚餐）</span></div><div class="photo-row" data-day="0922" data-tint="background:linear-gradient(145deg,#331708,#8a3a12)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/23</span><span class="di-w">三</span></div><span class="di-icon">🚡</span><span class="di-title">Santnerpass→Alpe di Siusi→Bolzano</span><span class="di-acc">Bolzano 青旅</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">穿越 Alpe di Siusi 高原，纜車下 Ortisei，搭車往 <b>Bolzano（波札諾）</b>。必訪考古博物館，館藏 5,300 年前的冰人 <b>Ötzi</b>——全球保存最完整的史前人類木乃伊。</p><div class="tags"><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Bolzano+Youth+Hostel" target="_blank">Bolzano Youth Hostel</a></span></div><div class="photo-row" data-day="0923" data-tint="background:linear-gradient(145deg,#331708,#8a3a12)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/24</span><span class="di-w">四</span></div><span class="di-icon">🚄</span><span class="di-title">波札諾→維羅納→米蘭 Frecciarossa 高鐵</span><span class="di-acc">米蘭青旅</span><span class="di-chev">›</span></div></summary><div class="di-body"><p class="di-desc">搭乘 <b>Frecciarossa（紅箭高鐵）</b>穿越 Po Valley 平原抵達時尚之都米蘭（Milano）。傍晚在 Navigli 運河區閒逛，享用最後義式晚餐。</p><div class="tags"><span class="tag t-train">🚄 Frecciarossa Bolzano→Verona 13:12/14:40（7車8D）</span><span class="tag t-train">🚄 Frecciarossa Verona→Milano 15:02/16:19（8車11D）</span><span class="tag t-acc">🏠 <a href="https://maps.google.com/?q=Ostello+Bello+Grande+Milan" target="_blank">Ostello Bello Grande</a>（6人女宿）· Via Lepetit 33</span></div><div class="photo-row" data-day="0924" data-tint="background:linear-gradient(145deg,#331708,#8a3a12)"></div></div></details>
+<details class="day-item"><summary><div class="di"><div class="di-date"><span class="di-n" style="color:var(--cc)">9/25</span><span class="di-w">五</span></div><span class="di-icon">🏙️</span><span class="di-title">米蘭市區 → 深夜飛杜拜 · 回程展開</span><span class="di-acc">—</span><span class="di-chev">›</span></div></summary><div class="di-body"><ul class="di-desc"><li><b>Duomo di Milano</b>：哥德式大教堂，建造歷時 600 年，可上頂俯瞰全城</li><li><b>Galleria Vittorio Emanuele II</b>：義大利最古老購物商場</li><li><b>Navigli 運河區</b>：義式 Aperitivo 開胃酒文化</li></ul><div class="tags"><span class="tag t-fly">✈️ EK092 MXP→杜拜 22:15/06:20+1</span><span class="tag t-note">🌙 當晚紅眼班機 · 無住宿</span></div><div class="warn">⚠️ 22:15 起飛，至少提前 3h 到 Malpensa（MXP）· 市區搭 Malpensa Express 約 45 分</div><div class="photo-row" data-day="0925" data-tint="background:linear-gradient(145deg,#331708,#8a3a12)"></div></div></details>
+</div></section>
+<div class="foot">歐洲之旅 2026 · 個人旅遊手冊 · 圖片由 Wikipedia 提供 · 所有訂位代碼已移除</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// Back to top
+window.addEventListener('scroll',()=>{
+  document.getElementById('btt').classList.toggle('show',window.scrollY>300);
+});
+
+// Nav highlight
+const nps=document.querySelectorAll('.np');
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) nps.forEach(p=>p.classList.toggle('on',p.getAttribute('href')==='#'+e.target.id));
+  });
+},{rootMargin:'-45% 0px -45% 0px'});
+document.querySelectorAll('.country-sec').forEach(s=>obs.observe(s));
+
+
+// ── Photos: resolved via Wikipedia REST API (CORS-open, returns each
+//    article's lead image, so filenames are never guessed).
+(function(){
+  function atWidth(u, px){
+    if(!u) return u;
+    const s = u.lastIndexOf('/');
+    const name = u.slice(s + 1);
+    const p = name.indexOf('px-');
+    if(p < 0) return u;
+    return u.slice(0, s + 1) + px + name.slice(p);
+  }
+
+  // Build a day's photo strip from whatever files exist in images/.
+  // Tiles are created for images/<day>-1.jpg ... -MAX.jpg; each stays hidden
+  // unless its file actually loads, so gaps and short days collapse cleanly.
+  const MAX = 20;
+
+  function buildRow(row){
+    if(row.dataset.built) return;
+    row.dataset.built = '1';
+    const day  = row.dataset.day;
+    const tint = row.dataset.tint || '';
+    if(!day) return;
+
+    for(let i = 1; i <= MAX; i++){
+      const fig = document.createElement('figure');
+      fig.className = 'pf';
+      if(tint) fig.setAttribute('style', tint);
+
+      const img = document.createElement('img');
+      img.className = 'pi';
+      img.alt = '';
+      img.loading = 'lazy';
+      img.addEventListener('click', () => showLb(img));
+      fig.appendChild(img);
+      row.appendChild(fig);
+
+      const src = 'images/' + day + '-' + i + '.jpg';
+      const probe = new Image();
+      probe.onload = () => {
+        img.src = src;
+        fig.classList.add('has-photo');
+        const r = probe.naturalWidth / probe.naturalHeight;
+        if(r < 0.9) fig.classList.add('portrait');
+        else if(r < 1.25) fig.classList.add('square');
+      };
+      probe.src = src;
+    }
+  }
+
+  const io = new IntersectionObserver((es,o) => {
+    es.forEach(e => { if(e.isIntersecting){ buildRow(e.target); o.unobserve(e.target); } });
+  }, {rootMargin:'400px'});
+  document.querySelectorAll('.photo-row').forEach(r => io.observe(r));
+
+  document.querySelectorAll('details.day-item').forEach(d => {
+    d.addEventListener('toggle', () => {
+      if(d.open) d.querySelectorAll('.photo-row').forEach(buildRow);
+    });
+  });
+
+  window.__hires = u => atWidth(u, 1600);
+  document.querySelectorAll('.photo-row').forEach(r => io.observe(r));
+})();
+
+// Lightbox
+let lbSet = [], lbIdx = 0;
+
+function showLb(img) {
+  if(!img.getAttribute('src')) return;
+  // all loaded photos in this day's strip become the gallery
+  const row = img.closest('.photo-row');
+  lbSet = row ? [...row.querySelectorAll('img.pi')].filter(i => i.getAttribute('src')) : [img];
+  lbIdx = Math.max(0, lbSet.indexOf(img));
+  renderLb();
+  document.getElementById('lb').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+
+function renderLb() {
+  const img = lbSet[lbIdx];
+  if(!img) return;
+  document.getElementById('lb-img').src = window.__hires(img.getAttribute('src'));
+  document.getElementById('lb-count').textContent =
+    lbSet.length > 1 ? (lbIdx + 1) + ' / ' + lbSet.length : '';
+  document.getElementById('lb-prev').disabled = lbSet.length < 2;
+  document.getElementById('lb-next').disabled = lbSet.length < 2;
+}
+
+function stepLb(d) {
+  if(lbSet.length < 2) return;
+  lbIdx = (lbIdx + d + lbSet.length) % lbSet.length;   // wraps around
+  renderLb();
+}
+
+function closeLb() {
+  document.getElementById('lb').classList.remove('on');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+  if(!document.getElementById('lb').classList.contains('on')) return;
+  if(e.key === 'Escape') closeLb();
+  else if(e.key === 'ArrowLeft')  stepLb(-1);
+  else if(e.key === 'ArrowRight') stepLb(1);
+});
+
+// swipe on touch devices
+(function(){
+  const lb = document.getElementById('lb');
+  let x0 = null;
+  lb.addEventListener('touchstart', e => { x0 = e.changedTouches[0].clientX; }, {passive:true});
+  lb.addEventListener('touchend', e => {
+    if(x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0;
+    if(Math.abs(dx) > 50) stepLb(dx < 0 ? 1 : -1);
+    x0 = null;
+  }, {passive:true});
+})();
+
+// Leaflet
+function tile(m){L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© <a href="https://openstreetmap.org">OSM</a>',maxZoom:18}).addTo(m)}
+function pin(c){return L.divIcon({className:'',html:`<div style="width:11px;height:11px;background:${c};border:2px solid #fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>`,iconSize:[11,11],iconAnchor:[5.5,5.5]})}
+
+const mW=L.map('lmap-whw',{scrollWheelZoom:false});tile(mW);
+[[56.096,-4.535,'Balmaha/Conic Hill','#1a6040'],[56.533,-4.763,'Bridge of Orchy 起點','#f59e0b'],
+ [56.656,-4.857,'Kingshouse Hotel','#1a6040'],[56.672,-4.887,"Devil's Staircase 539m",'#dc2626'],
+ [56.714,-4.937,'Kinlochleven 終點','#f59e0b'],[56.820,-5.105,'Fort William','#1a6040'],
+ [57.062,-4.425,'Loch Ossian YH','#60a5fa'],[57.059,-4.362,'Corrour Station','#60a5fa']
+].forEach(([a,b,n,c])=>L.marker([a,b],{icon:pin(c)}).bindPopup(n).addTo(mW));
+L.polyline([[56.533,-4.763],[56.656,-4.857],[56.672,-4.887],[56.714,-4.937]],{color:'#1a6040',weight:3,opacity:.7}).addTo(mW);
+mW.fitBounds([[56.09,-5.2],[57.07,-4.3]]);
+
+const lp=[[63.987,-19.059,'Landmannalaugar','#f59e0b'],[63.918,-19.116,'Hrafntinnusker','#1a4e7a'],
+ [63.811,-19.268,'Alftavatn天鵝湖','#1a4e7a'],[63.768,-19.410,'Hvanngil','#1a4e7a'],
+ [63.712,-19.538,'Emstrur','#1a4e7a'],[63.683,-19.530,'Þórsmörk','#16a34a'],
+ [63.642,-19.625,'Baldvinsskáli','#7c3aed'],[63.530,-19.511,'Skógar終點','#f59e0b']];
+const mL=L.map('lmap-laug',{scrollWheelZoom:false});tile(mL);
+lp.forEach(([a,b,n,c])=>L.marker([a,b],{icon:pin(c)}).bindPopup(n).addTo(mL));
+L.polyline(lp.map(([a,b])=>[a,b]),{color:'#1a4e7a',weight:3,opacity:.7}).addTo(mL);
+mL.fitBounds(L.latLngBounds(lp.map(([a,b])=>[a,b])).pad(.08));
+
+const mF=L.map('lmap-faroe',{scrollWheelZoom:false});tile(mF);
+[[62.009,-6.789,'Tórshavn首都','#f59e0b'],[62.064,-7.277,'Vágar機場','#0b6a79'],
+ [62.040,-7.193,'Sørvágsvatn懸湖','#0b6a79'],[62.099,-7.644,'Mykines海鸚島','#16a34a'],
+ [62.228,-6.589,'Klaksvík','#0b6a79'],[62.310,-6.648,'Kalsoy 007島','#0b6a79'],
+ [62.295,-7.013,'Tjørnuvík','#0b6a79'],[62.150,-6.917,'Gjógv峽谷村','#0b6a79']
+].forEach(([a,b,n,c])=>L.marker([a,b],{icon:pin(c)}).bindPopup(n).addTo(mF));
+mF.fitBounds([[62.0,-7.7],[62.35,-6.5]]);
+
+const mD=L.map('lmap-dolomites',{scrollWheelZoom:false});tile(mD);
+[[46.730,12.218,'Dobbiaco/Toblach','#f59e0b'],[46.540,12.303,"Cortina d'Ampezzo",'#ae4b0e'],
+ [46.694,12.085,'Lago di Braies珍珠湖','#ae4b0e'],[46.618,12.302,'Tre Cime三峰山','#dc2626'],
+ [46.643,12.278,'Rifugio Locatelli','#ae4b0e'],[46.574,11.672,'Ortisei/Val Gardena','#f59e0b'],
+ [46.587,11.692,'Seceda最美山脊','#ae4b0e'],[46.543,11.617,'Alpe di Siusi高原','#ae4b0e'],
+ [46.547,11.755,'Sassolungo長石峰','#ae4b0e'],[46.420,11.640,'Santnerpass山口','#ae4b0e'],
+ [46.499,11.355,'Bolzano/Bozen','#f59e0b']
+].forEach(([a,b,n,c])=>L.marker([a,b],{icon:pin(c)}).bindPopup(n).addTo(mD));
+mD.fitBounds([[46.4,11.3],[46.75,12.4]]);
+</script>
+</body></html>
